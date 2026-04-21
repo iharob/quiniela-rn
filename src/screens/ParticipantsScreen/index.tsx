@@ -1,14 +1,14 @@
+import { SettingsModal } from '@app/components/SettingsModal';
 import { HamburgerMenu } from '@app/components/hamburgerMenu';
 import { ScoreDetails } from '@app/screens/ParticipantsScreen/screens/ScoreDetails';
 import { TabbedView } from '@app/screens/ParticipantsScreen/screens/TabbedView';
-import { useTheme } from '@app/theme/ThemeContext';
 import {
   createStackNavigator,
   StackNavigationOptions,
 } from '@react-navigation/stack';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { HeaderBackButton } from '@react-navigation/elements';
+import { RulesModal } from '@app/components/RulesModal.tsx';
 
 export type StackParamsList = {
   TabbedView: undefined;
@@ -18,6 +18,8 @@ export type StackParamsList = {
     readonly photoUrl?: string;
     readonly bio?: string;
   };
+  Settings: undefined;
+  Rules: undefined;
 };
 
 const Stack = createStackNavigator<StackParamsList>();
@@ -38,6 +40,8 @@ export const ParticipantsScreen: React.FC = (): React.ReactElement => {
       <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="TabbedView" component={TabbedView} />
         <Stack.Screen name="UserScoreDetails" component={ScoreDetails} />
+        <Stack.Screen name="Settings" component={SettingsModal} />
+        <Stack.Screen name="Rules" component={RulesModal} />
       </Stack.Navigator>
     </View>
   );

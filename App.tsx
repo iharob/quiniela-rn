@@ -7,15 +7,20 @@ import {
 } from '@app/mobx/tournamentConfigStore';
 import { MainNavigator } from '@app/screens/main';
 import { ThemeProvider } from '@app/theme/ThemeContext';
-import { defaultConfig, TournamentConfig } from '@app/types/tournamentConfig';
+import {
+  defaultConfig,
+  TournamentConfig,
+  TournamentTheme,
+} from '@app/types/tournamentConfig';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { barStyleLightContent } from '@app/constants';
 import {
   DefaultTheme,
   NavigationContainer,
   Theme,
 } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { StatusBar, StyleSheet, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const apiInstance = new Api();
@@ -35,11 +40,13 @@ const App: React.FC = (): React.ReactElement => {
       try {
         const fetched = await apiInstance.fetchTournamentConfig();
         setApiUrl(fetched.apiDomain);
+
         apiInstance.setBaseUrl(`${fetched.apiDomain}/api/v1`);
         tournamentConfigStore.setConfig(fetched);
+
         await tournamentConfigStore.saveConfig(fetched);
         setConfig(fetched);
-      } catch  {
+      } catch {
         try {
           const cached = await tournamentConfigStore.loadCached();
           if (cached) {
@@ -57,40 +64,49 @@ const App: React.FC = (): React.ReactElement => {
       }
     };
 
-    void loadConfig();
+    loadConfig().then((): void => {
+      console.info('Configuration loaded');
+    });
   }, []);
 
-  const theme = React.useMemo((): Theme => {
-    const t = config.theme;
+  const theme = React.useMemo(
+    (): TournamentTheme => config.theme,
+    [config.theme],
+  );
 
+  const applicationTheme = React.useMemo((): Theme => {
     return {
       ...DefaultTheme,
       dark: true,
       colors: {
         ...DefaultTheme.colors,
-        primary: t.primaryColor,
-        background: t.backgroundColor,
-        card: t.cardColor,
-        text: t.textColor,
-        border: t.borderColor,
-        notification: t.primaryColorBright,
+        primary: theme.primaryColor,
+        background: theme.backgroundColor,
+        card: theme.cardColor,
+        text: theme.textColor,
+        border: theme.borderColor,
+        notification: theme.primaryColorBright,
       },
       fonts: DefaultTheme.fonts,
     };
-  }, [config.theme]);
+  }, [theme]);
 
   const containerStyle = React.useMemo(
     (): ViewStyle => ({
       ...styles.container,
-      backgroundColor: config.theme.backgroundColor,
+      backgroundColor: theme.cardColor,
     }),
-    [config.theme.backgroundColor],
+    [theme.cardColor],
   );
 
   if (!configLoaded) {
     return (
       <ThemeProvider theme={config.theme}>
         <SafeAreaView style={containerStyle}>
+          <StatusBar
+            backgroundColor={config.theme.cardColor}
+            barStyle={barStyleLightContent}
+          />
           <FullScreenLogo />
         </SafeAreaView>
       </ThemeProvider>
@@ -98,22 +114,26 @@ const App: React.FC = (): React.ReactElement => {
   }
 
   return (
-    <TournamentConfigStoreContext.Provider value={tournamentConfigStore}>
-      <ThemeProvider theme={config.theme}>
-        <ApiContext.Provider value={apiInstance}>
-          <SafeAreaView style={containerStyle}>
-            <NavigationContainer theme={theme}>
-              <MainNavigator />
-            </NavigationContainer>
-          </SafeAreaView>
-        </ApiContext.Provider>
-      </ThemeProvider>
-    </TournamentConfigStoreContext.Provider>
+    <ThemeProvider theme={config.theme}>
+      <ApiContext.Provider value={apiInstance}>
+        <SafeAreaView style={containerStyle}>
+          <StatusBar
+            backgroundColor={theme.cardColor}
+            barStyle={barStyleLightContent}
+          />
+          <NavigationContainer theme={applicationTheme}>
+            <MainNavigator />
+          </NavigationContainer>
+        </SafeAreaView>
+      </ApiContext.Provider>
+    </ThemeProvider>
   );
 };
 
 export default App;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1,
+  },
 });

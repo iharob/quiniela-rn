@@ -1,5 +1,3 @@
-import { RulesModal } from '@app/components/RulesModal';
-import { SettingsModal } from '@app/components/SettingsModal';
 import { useSessionStore } from '@app/mobx/sessionStore';
 import { useTheme } from '@app/theme/ThemeContext';
 import {
@@ -10,6 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   Alert,
   Modal,
@@ -23,14 +22,13 @@ import {
 import { StackHeaderRightProps } from '@react-navigation/stack';
 
 export const HamburgerMenu = (_: StackHeaderRightProps): React.ReactNode => {
+  const navigation = useNavigation<any>();
   const [open, setOpen] = React.useState(false);
-  const [rulesVisible, setRulesVisible] = React.useState(false);
-  const [settingsVisible, setSettingsVisible] = React.useState(false);
   const theme = useTheme();
   const sessionStore = useSessionStore();
 
   const toggle = React.useCallback((): void => {
-    setOpen(v => !v);
+    setOpen((previousValue: boolean): boolean => !previousValue);
   }, []);
 
   const close = React.useCallback((): void => {
@@ -38,36 +36,29 @@ export const HamburgerMenu = (_: StackHeaderRightProps): React.ReactNode => {
   }, []);
 
   const handleShowRules = React.useCallback((): void => {
-    setOpen(false);
-    setRulesVisible(true);
-  }, []);
-
-  const handleCloseRules = React.useCallback((): void => {
-    setRulesVisible(false);
-  }, []);
+    close();
+    navigation.navigate('Rules');
+  }, [navigation, close]);
 
   const handleShowSettings = React.useCallback((): void => {
-    setOpen(false);
-    setSettingsVisible(true);
-  }, []);
-
-  const handleCloseSettings = React.useCallback((): void => {
-    setSettingsVisible(false);
-  }, []);
+    close();
+    navigation.navigate('Settings');
+  }, [navigation, close]);
 
   const handleLogout = React.useCallback((): void => {
-    setOpen(false);
+    close();
+
     Alert.alert('Cerrar sesión', '¿Estás seguro que deseas cerrar sesión?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Cerrar sesión',
         style: 'destructive',
-        onPress: (): void => {
-          void sessionStore.logout();
+        onPress: async (): Promise<void> => {
+          await sessionStore.logout();
         },
       },
     ]);
-  }, [sessionStore]);
+  }, [sessionStore, close]);
 
   const statusBarHeight = StatusBar.currentHeight ?? 0;
 
@@ -132,8 +123,7 @@ export const HamburgerMenu = (_: StackHeaderRightProps): React.ReactNode => {
         </Pressable>
       </Modal>
 
-      <RulesModal visible={rulesVisible} onClose={handleCloseRules} />
-      <SettingsModal visible={settingsVisible} onClose={handleCloseSettings} />
+      {/*<RulesModal visible={rulesVisible} onClose={handleCloseRules} />*/}
     </View>
   );
 };

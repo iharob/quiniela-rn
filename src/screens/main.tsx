@@ -66,7 +66,7 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
   if (!session) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <StatusBar backgroundColor={theme.backgroundColor} barStyle={barStyleDarkContent} />
+        <StatusBar backgroundColor={theme.cardColor} barStyle={barStyleLightContent} />
         <AuthScreen />
       </SessionStoreContext.Provider>
     );

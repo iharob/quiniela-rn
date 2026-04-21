@@ -1,3 +1,4 @@
+import { SettingsModal } from '@app/components/SettingsModal';
 import { HamburgerMenu } from '@app/components/hamburgerMenu';
 import { useApi } from '@app/context/api';
 import {
@@ -26,6 +27,7 @@ export type PredictionStackParamsList = {
   readonly Groups: undefined;
   readonly Knockout: KnockoutParams;
   readonly Final: GameWithResult;
+  readonly Settings: undefined;
 };
 
 export const PredictScreen: React.FC = (): React.ReactElement => {
@@ -75,6 +77,11 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
             component={GenericKnockout}
           />
           <RegistrationRoutes.Screen name="Final" component={Final} />
+          <RegistrationRoutes.Screen
+            name="Settings"
+            component={SettingsModal}
+            options={{ title: 'Ajustes', headerRight: undefined }}
+          />
         </RegistrationRoutes.Navigator>
       </KnockoutStoreContext.Provider>
     </GroupsScreenStoreContext.Provider>
