@@ -1,4 +1,4 @@
-package com.quiniela
+package com.iaales.quiniela
 
 import android.app.Application
 import com.facebook.react.PackageList

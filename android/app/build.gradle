@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.quiniela"
+    namespace "com.iaales.quiniela"
     defaultConfig {
-        applicationId "com.quiniela"
+        applicationId "com.iaales.quiniela"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
