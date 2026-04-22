@@ -1,5 +1,4 @@
 import { useLogout } from '@app/hooks/useLogout';
-import { useRankingsScreenStoreContext } from '@app/mobx/rankingsScreenStore';
 import { Chat } from '@app/screens/ParticipantsScreen/screens/Chat';
 import { Ongoing } from '@app/screens/ParticipantsScreen/screens/Ongoing';
 import {
@@ -15,24 +14,10 @@ import {
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { VoidFunction } from '@app/types';
 
 export const TabbedView: React.FC = (): React.ReactElement => {
-  const store = useRankingsScreenStoreContext();
   const theme = useTheme();
   useLogout('Si sale debe volver a colocar su usuario y contraseña para volver a entrar.');
-
-  React.useEffect((): void | VoidFunction => {
-    const abortController = new AbortController();
-
-    setTimeout((): void => {
-      store.fetchRankings(abortController.signal);
-    }, 0);
-
-    return (): void => {
-      abortController.abort();
-    };
-  }, [store]);
 
   const screenOptions = React.useMemo(
     () => ({

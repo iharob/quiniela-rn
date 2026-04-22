@@ -1,14 +1,14 @@
 import { GoogleGLogo } from '@app/components/googleGLogo';
 import { Spinner } from '@app/components/spinner';
-import { barStyleDarkContent, logoHeight, logoWidth } from '@app/constants';
-import { Api, useApi } from '@app/context/api';
-import { useSessionStore } from '@app/mobx/sessionStore';
-import { useTournamentConfig } from '@app/mobx/tournamentConfigStore';
+import { logoHeight, logoWidth } from '@app/constants';
+import { useGoogleAuthMutation } from '@app/hooks/mutations';
 import { useTheme } from '@app/theme/ThemeContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import React from 'react';
-import { Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface WelcomeScreenProps {
   readonly onNavigateToRegister: () => void;
@@ -20,53 +20,63 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
 ): React.ReactElement => {
   const { onNavigateToRegister, onNavigateToLogin } = props;
   const theme = useTheme();
-  const api = useApi();
-  const sessionStore = useSessionStore();
-  const tournamentConfigStore = useTournamentConfig();
-  const tournamentName = tournamentConfigStore.config.name;
 
-  const [processing, setProcessing] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  const googleAuthMutation = useGoogleAuthMutation();
+
   const handleGoogleSignIn = React.useCallback(async (): Promise<void> => {
-    setProcessing(true);
     setError(null);
     console.info('[GoogleSignIn] start');
     try {
       console.info('[GoogleSignIn] checking Play Services');
-      const hasPlay = await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const hasPlay = await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
       console.info(`[GoogleSignIn] Play Services available: ${hasPlay}`);
 
       console.info('[GoogleSignIn] calling signIn()');
-      const userInfo = await GoogleSignin.signIn();
-      console.info(
-        `[GoogleSignIn] signIn() ok — user=${
-          userInfo.user?.email ?? 'unknown'
-        } hasIdToken=${!!userInfo.idToken}`,
-      );
+      const signInResponse = await GoogleSignin.signIn();
+      if (signInResponse.type === 'success') {
+        const userInfo = signInResponse.data;
+        const name = userInfo.user?.email ?? 'unknown';
+        const hasToken = !!userInfo.idToken;
 
-      const idToken = userInfo.idToken;
-      if (!idToken) {
-        console.warn(
-          '[GoogleSignIn] signIn returned no idToken — check webClientId matches a Web OAuth client',
+        console.info(
+          `[GoogleSignIn] signIn() ok — user=${name} hasIdToken=${hasToken}`,
         );
-        setError('No se pudo obtener el token de Google');
-        return;
-      }
 
-      console.info('[GoogleSignIn] exchanging idToken with backend');
-      const session = await api.googleAuth(idToken);
-      api.setBearerToken(session.token);
-      await AsyncStorage.setItem(Api.BEARER_TOKEN_KEY, session.token);
-      sessionStore.setSession(session);
-      console.info('[GoogleSignIn] session established');
+        const idToken = userInfo.idToken;
+        if (!idToken) {
+          console.warn(
+            '[GoogleSignIn] signIn returned no idToken — check webClientId matches a Web OAuth client',
+          );
+          setError('No se pudo obtener el token de Google');
+          return;
+        }
+
+        console.info('[GoogleSignIn] exchanging idToken with backend');
+        googleAuthMutation.mutate(idToken, {
+          onSuccess: () => {
+            console.info('[GoogleSignIn] session established');
+          },
+          onError: (e: unknown) => {
+            const err = e as { code?: string; message?: string; name?: string };
+            setError(
+              `No pudimos iniciar sesión con Google${
+                err.code ? ` (code ${err.code})` : ''
+              }`,
+            );
+          },
+        });
+      }
     } catch (e: unknown) {
       const err = e as { code?: string; message?: string; name?: string };
       const code = err.code;
       console.warn(
-        `[GoogleSignIn] error code=${code ?? 'n/a'} name=${err.name ?? 'n/a'} message=${
-          err.message ?? String(e)
-        }`,
+        `[GoogleSignIn] error code=${code ?? 'n/a'} name=${
+          err.name ?? 'n/a'
+        } message=${err.message ?? String(e)}`,
       );
       if (code === statusCodes.SIGN_IN_CANCELLED) {
         console.info('[GoogleSignIn] user cancelled');
@@ -87,25 +97,26 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
         );
         return;
       }
-      setError(`No pudimos iniciar sesión con Google${code ? ` (code ${code})` : ''}`);
-    } finally {
-      setProcessing(false);
+      setError(
+        `No pudimos iniciar sesión con Google${code ? ` (code ${code})` : ''}`,
+      );
     }
-  }, [api, sessionStore]);
+  }, [googleAuthMutation]);
 
   return (
     <>
       <View style={styles.container}>
         <View style={styles.logoContainer}>
-          <Image source={require('@app/images/logo.png')} style={styles.fullscreenLogo} />
-          <Text style={[styles.tournamentName, { color: theme.primaryColor }]}>
-            {tournamentName}
-          </Text>
+          <Image
+            source={require('@app/images/logo.png')}
+            style={styles.fullscreenLogo}
+          />
+          <Text style={styles.tournamentName}>Compa del mundo 2026</Text>
         </View>
         <TouchableOpacity
           style={styles.googleButton}
           onPress={handleGoogleSignIn}
-          disabled={processing}
+          disabled={googleAuthMutation.isPending}
           activeOpacity={0.85}
           accessibilityRole="button"
           accessibilityLabel="Iniciar sesión con Google"
@@ -116,20 +127,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
           <Text style={styles.googleButtonText}>Iniciar sesión con Google</Text>
         </TouchableOpacity>
         <View style={styles.dividerRow}>
-          <View style={[styles.dividerLine, { backgroundColor: theme.borderColor }]} />
-          <Text style={[styles.dividerText, { color: theme.textColor }]}>o</Text>
-          <View style={[styles.dividerLine, { backgroundColor: theme.borderColor }]} />
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>o</Text>
+          <View style={styles.dividerLine} />
         </View>
         <TouchableOpacity onPress={onNavigateToRegister} activeOpacity={0.7}>
-          <Text style={[styles.linkText, { color: theme.primaryColor }]}>
-            Registrarse con email
-          </Text>
+          <Text style={styles.linkText}>Registrarse con email</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onNavigateToLogin} activeOpacity={0.7}>
-          <Text style={[styles.linkText, { color: theme.primaryColor }]}>Ya tengo cuenta</Text>
+          <Text style={[styles.linkText, { color: theme.primaryColor }]}>
+            Ya tengo cuenta
+          </Text>
         </TouchableOpacity>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <Spinner visible={processing} />
+        <Spinner visible={googleAuthMutation.isPending} />
       </View>
     </>
   );

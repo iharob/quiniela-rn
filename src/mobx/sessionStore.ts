@@ -26,24 +26,17 @@ export interface PublicUserProfile {
 
 export class SessionStore {
   public session: UserSession | null = null;
-  public profile: UserProfile | null = null;
 
   constructor() {
     makeObservable(this, {
       session: observable,
-      profile: observable,
       setSession: action.bound,
-      setProfile: action.bound,
       logout: action.bound,
     });
   }
 
   public setSession(session: UserSession | null): void {
     this.session = session;
-  }
-
-  public setProfile(profile: UserProfile): void {
-    this.profile = profile;
   }
 
   public async logout(): Promise<void> {

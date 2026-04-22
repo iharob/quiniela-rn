@@ -1,13 +1,12 @@
 import { Avatar } from '@app/components/Avatar';
 import { TeamItem } from '@app/components/teamItem';
 import { ListItemSeparator } from '@app/elements/listItemSeparator';
-import { useRankingsScreenStoreContext } from '@app/mobx/rankingsScreenStore';
+import { useOngoing } from '@app/hooks/queries';
 import { useSessionStore } from '@app/mobx/sessionStore';
 import { ListEmptyMessage } from '@app/screens/ParticipantsScreen/screens/components/listEmptyMessage';
 import { useThemedStyles } from '@app/theme/useThemedStyles';
 import { TournamentTheme } from '@app/types/tournamentConfig';
 import { GameResultGroup, SelfResult, UserResult } from '@app/types/userResults';
-import { observer } from 'mobx-react';
 import React from 'react';
 import {
   ListRenderItemInfo,
@@ -18,16 +17,15 @@ import {
   View,
 } from 'react-native';
 
-export const Ongoing: React.FC = observer((): React.ReactElement => {
+export const Ongoing: React.FC = (): React.ReactElement => {
   const sessionStore = useSessionStore();
-  const store = useRankingsScreenStoreContext();
-  const results = store.currentGameResults;
+  const { data: results = [], isFetching, refetch } = useOngoing();
   const currentUserId = sessionStore.session?.userId ?? -1;
   const themedStyles = useThemedStyles(themedStylesFactory);
 
   const handleRefresh = React.useCallback((): void => {
-    store.fetchOngoing();
-  }, [store]);
+    refetch();
+  }, [refetch]);
 
   const sections = React.useMemo(
     (): ReadonlyArray<SectionListData<UserResult, Omit<GameResultGroup & SelfResult, 'results'>>> =>
@@ -47,10 +45,6 @@ export const Ongoing: React.FC = observer((): React.ReactElement => {
       ),
     [currentUserId, results],
   );
-
-  React.useEffect((): void => {
-    store.fetchOngoing();
-  }, [store]);
 
   const renderSectionHeader = React.useCallback(
     ({
@@ -132,11 +126,11 @@ export const Ongoing: React.FC = observer((): React.ReactElement => {
       renderItem={renderItem}
       ItemSeparatorComponent={ListItemSeparator}
       ListEmptyComponent={<ListEmptyMessage message="No hay partidos en este momento" />}
-      refreshing={store.fetching}
+      refreshing={isFetching}
       onRefresh={handleRefresh}
     />
   );
-});
+};
 
 const themedStylesFactory = (theme: TournamentTheme) =>
   StyleSheet.create({

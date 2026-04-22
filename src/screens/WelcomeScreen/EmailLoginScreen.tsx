@@ -1,14 +1,10 @@
 import { Spinner } from '@app/components/spinner';
-import { barStyleDarkContent } from '@app/constants';
-import { Api, useApi } from '@app/context/api';
-import { useSessionStore } from '@app/mobx/sessionStore';
+import { useEmailLoginMutation } from '@app/hooks/mutations';
 import { useTheme } from '@app/theme/ThemeContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React from 'react';
 import {
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -24,13 +20,12 @@ interface Props {
 export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElement => {
   const { onBack } = props;
   const theme = useTheme();
-  const api = useApi();
-  const sessionStore = useSessionStore();
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [processing, setProcessing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  const loginMutation = useEmailLoginMutation();
 
   const passwordRef = React.useRef<TextInput>(null);
 
@@ -48,31 +43,28 @@ export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElem
       return;
     }
 
-    setProcessing(true);
-    try {
-      const session = await api.emailLogin(email.trim(), password);
-      api.setBearerToken(session.token);
-      await AsyncStorage.setItem(Api.BEARER_TOKEN_KEY, session.token);
-      sessionStore.setSession(session);
-    } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        const status = e.response?.status;
-        if (status === 401) {
-          setError('Correo o contrase\u00f1a incorrectos');
-        } else if (status === 409) {
-          setError(
-            'Esta cuenta usa Google Sign-In. Us\u00e1 el bot\u00f3n de Google para iniciar sesi\u00f3n.',
-          );
-        } else {
-          setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
-        }
-      } else {
-        setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
-      }
-    } finally {
-      setProcessing(false);
-    }
-  }, [email, password, api, sessionStore]);
+    loginMutation.mutate(
+      { email: email.trim(), password },
+      {
+        onError: (e: unknown) => {
+          if (axios.isAxiosError(e)) {
+            const status = e.response?.status;
+            if (status === 401) {
+              setError('Correo o contrase\u00f1a incorrectos');
+            } else if (status === 409) {
+              setError(
+                'Esta cuenta usa Google Sign-In. Us\u00e1 el bot\u00f3n de Google para iniciar sesi\u00f3n.',
+              );
+            } else {
+              setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
+            }
+          } else {
+            setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
+          }
+        },
+      },
+    );
+  }, [email, password, loginMutation]);
 
   const inputStyle = React.useMemo(
     (): TextStyle => ({
@@ -108,9 +100,9 @@ export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElem
     (): ViewStyle => ({
       ...styles.button,
       backgroundColor: theme.primaryColor,
-      opacity: processing ? 0.5 : 1,
+      opacity: loginMutation.isPending ? 0.5 : 1,
     }),
-    [theme.primaryColor, processing],
+    [theme.primaryColor, loginMutation.isPending],
   );
 
   return (
@@ -155,14 +147,14 @@ export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElem
         <TouchableOpacity
           style={buttonStyle}
           onPress={handleLogin}
-          disabled={processing}
+          disabled={loginMutation.isPending}
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <Spinner visible={processing} />
+        <Spinner visible={loginMutation.isPending} />
       </ScrollView>
     </>
   );

@@ -1,4 +1,4 @@
-import { useApi } from '@app/context/api';
+import { useUserScoreDetails } from '@app/hooks/queries';
 import { StackParamsList } from '@app/screens/ParticipantsScreen';
 import { HeaderTitle } from '@app/screens/ParticipantsScreen/screens/ScoreDetails/headerTitle';
 import {
@@ -21,6 +21,7 @@ import {
   RouteProp,
   useNavigation,
 } from '@react-navigation/native';
+import { HeaderTitleProps } from '@react-navigation/elements';
 import React from 'react';
 import {
   SectionList,
@@ -29,7 +30,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { VoidFunction } from '@app/types';
 import { BackButton } from '@app/components/BackButton.tsx';
 
 interface Props {
@@ -42,52 +42,16 @@ export const ScoreDetails: React.FC<Props> = (
   const navigation = useNavigation<NavigationProp<StackParamsList>>();
   const theme = useTheme();
 
-  const [pointsDetails, setPointsDetails] = React.useState<PointsDetails>(
-    PointsDetails.empty(),
-  );
-  const [fetching, setFetching] = React.useState<boolean>(true);
-
   const { route } = props;
   const { userId } = route.params;
 
-  const abortControllerRef = React.useRef<AbortController | null>(null);
-  const api = useApi();
+  const { data: pointsDetails = PointsDetails.empty(), isFetching, refetch } = useUserScoreDetails(userId);
 
-  const refetch = React.useCallback((): void => {
-    const abortController = abortControllerRef.current;
-    if (abortController) {
-      abortController.abort();
-    }
-
-    abortControllerRef.current = new AbortController();
-
-    api
-      .getUserScoreDetails(userId, abortControllerRef.current.signal)
-      .then((response: PointsDetails): void => {
-        setPointsDetails(response);
-      })
-      .finally((): void => {
-        setTimeout((): void => {
-          setFetching(false);
-        }, 0);
-      });
-  }, [api, userId]);
-
-  React.useEffect((): VoidFunction => {
-    refetch();
-
-    return (): void => {
-      const abortController = abortControllerRef.current;
-      if (abortController) {
-        abortController.abort();
-        abortControllerRef.current = null;
-      }
-    };
-  }, [refetch]);
-
-  React.useEffect((): void | VoidFunction => {
+  React.useEffect((): void | (() => void) => {
     navigation.setOptions({
-      headerTitle: HeaderTitle,
+      headerTitle: (props: HeaderTitleProps): React.ReactNode => (
+        <HeaderTitle {...props} />
+      ),
       headerTintColor: '#fff',
       headerLeft: BackButton,
       headerLeftContainerStyle: {
@@ -143,11 +107,11 @@ export const ScoreDetails: React.FC<Props> = (
         renderSectionHeader={renderSectionHeader}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        refreshing={fetching}
+        refreshing={isFetching}
         initialNumToRender={104}
         maxToRenderPerBatch={104}
         windowSize={21}
-        scrollEnabled={!fetching}
+        scrollEnabled={!isFetching}
         onRefresh={refetch}
       />
     </View>

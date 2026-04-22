@@ -1,14 +1,10 @@
 import { Spinner } from '@app/components/spinner';
-import { barStyleDarkContent } from '@app/constants';
-import { Api, useApi } from '@app/context/api';
-import { useSessionStore } from '@app/mobx/sessionStore';
+import { useEmailRegisterMutation } from '@app/hooks/mutations';
 import { useTheme } from '@app/theme/ThemeContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React from 'react';
 import {
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -24,15 +20,14 @@ interface Props {
 export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactElement => {
   const { onBack } = props;
   const theme = useTheme();
-  const api = useApi();
-  const sessionStore = useSessionStore();
 
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
-  const [processing, setProcessing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  const registerMutation = useEmailRegisterMutation();
 
   const emailRef = React.useRef<TextInput>(null);
   const passwordRef = React.useRef<TextInput>(null);
@@ -65,24 +60,21 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
       return;
     }
 
-    setProcessing(true);
-    try {
-      const session = await api.emailRegister(email.trim(), name.trim(), password);
-      api.setBearerToken(session.token);
-      await AsyncStorage.setItem(Api.BEARER_TOKEN_KEY, session.token);
-      sessionStore.setSession(session);
-    } catch (e: unknown) {
-      if (axios.isAxiosError(e) && e.response?.status === 409) {
-        setError(
-          'Ya existe una cuenta con ese correo. Si te registraste con Google, usa el botón de Google.',
-        );
-      } else {
-        setError('No pudimos completar el registro. Intenta de nuevo.');
-      }
-    } finally {
-      setProcessing(false);
-    }
-  }, [name, email, password, confirmPassword, api, sessionStore]);
+    registerMutation.mutate(
+      { email: email.trim(), name: name.trim(), password },
+      {
+        onError: (e: unknown) => {
+          if (axios.isAxiosError(e) && e.response?.status === 409) {
+            setError(
+              'Ya existe una cuenta con ese correo. Si te registraste con Google, usa el botón de Google.',
+            );
+          } else {
+            setError('No pudimos completar el registro. Intenta de nuevo.');
+          }
+        },
+      },
+    );
+  }, [name, email, password, confirmPassword, registerMutation]);
 
   const inputStyle = React.useMemo(
     (): TextStyle => ({
@@ -118,9 +110,9 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
     (): ViewStyle => ({
       ...styles.button,
       backgroundColor: theme.primaryColor,
-      opacity: processing ? 0.5 : 1,
+      opacity: registerMutation.isPending ? 0.5 : 1,
     }),
-    [theme.primaryColor, processing],
+    [theme.primaryColor, registerMutation.isPending],
   );
 
   return (
@@ -191,14 +183,14 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
         <TouchableOpacity
           style={buttonStyle}
           onPress={handleRegister}
-          disabled={processing}
+          disabled={registerMutation.isPending}
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText}>Registrarse</Text>
         </TouchableOpacity>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <Spinner visible={processing} />
+        <Spinner visible={registerMutation.isPending} />
       </ScrollView>
     </>
   );

@@ -1,7 +1,6 @@
 import { FullScreenLogo } from '@app/components/fullScreenLogo';
-import { barStyleDarkContent, barStyleLightContent } from '@app/constants';
+import { barStyleLightContent } from '@app/constants';
 import { Api, useApi } from '@app/context/api';
-import { RankingsScreenStore, RankingsScreenStoreContext } from '@app/mobx/rankingsScreenStore';
 import { SessionStore, SessionStoreContext, UserSession } from '@app/mobx/sessionStore';
 import { ParticipantsScreen } from '@app/screens/ParticipantsScreen';
 import { PredictScreen } from '@app/screens/PredictScreen';
@@ -18,10 +17,6 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
   const theme = useTheme();
 
   const [loading, setLoading] = React.useState<boolean>(true);
-  const rankingsScreenStore = React.useMemo(
-    (): RankingsScreenStore => new RankingsScreenStore(api),
-    [api],
-  );
 
   const initialize = React.useCallback(async (): Promise<void> => {
     try {
@@ -78,9 +73,7 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
           barStyle={barStyleLightContent}
         />
         <View style={styles.flex}>
-          <RankingsScreenStoreContext.Provider value={rankingsScreenStore}>
-            <ParticipantsScreen />
-          </RankingsScreenStoreContext.Provider>
+          <ParticipantsScreen />
         </View>
       </SessionStoreContext.Provider>
     );

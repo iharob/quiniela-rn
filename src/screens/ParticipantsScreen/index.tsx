@@ -4,6 +4,7 @@ import { ScoreDetails } from '@app/screens/ParticipantsScreen/screens/ScoreDetai
 import { TabbedView } from '@app/screens/ParticipantsScreen/screens/TabbedView';
 import {
   createStackNavigator,
+  StackHeaderRightProps,
   StackNavigationOptions,
 } from '@react-navigation/stack';
 import React from 'react';
@@ -29,7 +30,9 @@ export const ParticipantsScreen: React.FC = (): React.ReactElement => {
     (): StackNavigationOptions => ({
       title: 'Quiniela Mundial 2026',
       headerShown: true,
-      headerRight: HamburgerMenu,
+      headerRight: (props: StackHeaderRightProps): React.ReactNode => (
+        <HamburgerMenu {...props} />
+      ),
       headerTintColor: 'white',
     }),
     [],

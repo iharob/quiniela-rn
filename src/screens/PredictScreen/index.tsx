@@ -13,6 +13,7 @@ import { GameWithResult } from '@app/screens/PredictScreen/screens/GroupsScreen/
 import { useTheme } from '@app/theme/ThemeContext';
 import {
   createStackNavigator,
+  StackHeaderRightProps,
   StackNavigationOptions,
 } from '@react-navigation/stack';
 import React from 'react';
@@ -58,7 +59,9 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
     (): StackNavigationOptions => ({
       title: '',
       headerShown: true,
-      headerRight: HamburgerMenu,
+      headerRight: (props: StackHeaderRightProps): React.ReactNode => (
+        <HamburgerMenu {...props} />
+      ),
       headerTintColor: theme.contrastTextColor,
     }),
     [theme.contrastTextColor],

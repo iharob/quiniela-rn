@@ -1,30 +1,23 @@
 import { ListItemSeparator } from '@app/elements/listItemSeparator';
-import { useRankingsScreenStoreContext } from '@app/mobx/rankingsScreenStore';
+import { useRankings } from '@app/hooks/queries';
 import { StackParamsList } from '@app/screens/ParticipantsScreen';
 import { ListEmptyMessage } from '@app/screens/ParticipantsScreen/screens/components/listEmptyMessage';
 import { ListHeader } from '@app/screens/ParticipantsScreen/screens/UsersList/listHeader';
 import { ListItem } from '@app/screens/ParticipantsScreen/screens/UsersList/listItem';
 import { RankingsEntry } from '@app/types/rankingsEntry';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { observer } from 'mobx-react';
 import React from 'react';
 import { FlatList, ListRenderItemInfo, StyleSheet, TouchableOpacity } from 'react-native';
 import { VoidFunction } from '@app/types';
 
-export const UsersList: React.FC = observer((): React.ReactElement => {
+export const UsersList: React.FC = (): React.ReactElement => {
   const navigation = useNavigation<NavigationProp<StackParamsList>>();
 
-  const store = useRankingsScreenStoreContext();
-  const { rankings } = store;
+  const { data: rankings = [], isFetching, refetch } = useRankings();
 
-  const handleRefresh = React.useCallback((): void | VoidFunction => {
-    const abortController = new AbortController();
-
-    store.fetchRankings(abortController.signal);
-    return (): void => {
-      abortController.abort();
-    };
-  }, [store]);
+  const handleRefresh = React.useCallback((): void => {
+    refetch();
+  }, [refetch]);
 
   const itemClickHandler = React.useCallback(
     (item: RankingsEntry): VoidFunction =>
@@ -62,17 +55,19 @@ export const UsersList: React.FC = observer((): React.ReactElement => {
       ItemSeparatorComponent={ListItemSeparator}
       renderItem={renderItem}
       ListEmptyComponent={
-        rankings.length === 0 ? (
+        rankings.length === 0 && !isFetching ? (
           <ListEmptyMessage message="Parece que aún no empezamos." />
+        ) : rankings.length === 0 && isFetching ? (
+          <ListEmptyMessage message="Cargando..." />
         ) : (
           <ListEmptyMessage message="Probablemente hay un problema de conexión." error={true} />
         )
       }
-      refreshing={store.fetching}
+      refreshing={isFetching}
       onRefresh={handleRefresh}
     />
   );
-});
+};
 
 const styles = StyleSheet.create({
   contentContainer: {

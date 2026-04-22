@@ -1,49 +1,38 @@
 import { defaultRules } from '@app/rules';
 import { useTheme } from '@app/theme/ThemeContext';
-import { faTimes, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import { faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React from 'react';
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BackButton } from '@app/components/BackButton.tsx';
+import { useNavigation } from '@react-navigation/native';
 
 export const RulesModal: React.FC = (): React.ReactElement => {
+  const navigation = useNavigation();
   const theme = useTheme();
 
+  React.useEffect((): void => {
+    navigation.setOptions({
+      headerLeft: BackButton,
+      headerRight: null,
+      headerLeftContainerStyle: {
+        paddingRight: 10,
+        paddingLeft: 10,
+      },
+    });
+  }, [navigation]);
+
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
-    >
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         {defaultRules.map(
           (rule, index): React.ReactElement => (
-            <View
-              key={index}
-              style={[styles.ruleRow, { borderBottomColor: theme.borderColor }]}
-            >
+            <View key={index} style={styles.ruleRow}>
               <View style={styles.ruleContent}>
-                <Text
-                  style={[styles.descriptionText, { color: theme.textColor }]}
-                >
-                  {rule.description}
-                </Text>
+                <Text style={styles.descriptionText}>{rule.description}</Text>
               </View>
-              <View
-                style={[
-                  styles.valueBadge,
-                  { backgroundColor: theme.cardColor },
-                ]}
-              >
-                <Text
-                  style={[styles.valueText, { color: theme.contrastTextColor }]}
-                >
-                  +{rule.value}
-                </Text>
+              <View style={styles.valueBadge}>
+                <Text style={styles.valueText}>+{rule.value}</Text>
               </View>
             </View>
           ),

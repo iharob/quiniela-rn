@@ -1,10 +1,9 @@
 import { Avatar } from '@app/components/Avatar';
-import { useApi } from '@app/context/api';
-import { UserProfile, useSessionStore } from '@app/mobx/sessionStore';
+import { useProfile } from '@app/hooks/queries';
+import { useUpdateProfileMutation } from '@app/hooks/mutations';
 import { useTheme } from '@app/theme/ThemeContext';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { observer } from 'mobx-react';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -20,12 +19,12 @@ import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { BackButton } from '@app/components/BackButton.tsx';
 
-export const SettingsModal: React.FC = observer((): React.ReactElement => {
+export const SettingsModal: React.FC = (): React.ReactElement => {
   const navigation = useNavigation();
-
   const theme = useTheme();
-  const api = useApi();
-  const sessionStore = useSessionStore();
+
+  const { data: profile, isLoading } = useProfile();
+  const updateProfileMutation = useUpdateProfileMutation();
 
   const [name, setName] = React.useState('');
   const [bio, setBio] = React.useState('');
@@ -35,33 +34,14 @@ export const SettingsModal: React.FC = observer((): React.ReactElement => {
     readonly type: string;
     readonly fileName: string;
   } | null>(null);
-  const [saving, setSaving] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-
-  const profile = React.useMemo(
-    (): UserProfile | null => sessionStore.profile,
-    [sessionStore],
-  );
 
   React.useEffect((): void => {
-    setLoading(true);
-    const fetchProfile = async (): Promise<void> => {
-      try {
-        const fetchedProfile = await api.fetchProfile();
-        sessionStore.setProfile(fetchedProfile);
-      } catch {
-        if (profile) {
-          setName(profile.name);
-          setBio(profile.bio ?? '');
-          setAvatarUri(profile.photoUrl);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [api, profile, sessionStore]);
+    if (profile) {
+      setName(profile.name);
+      setBio(profile.bio ?? '');
+      setAvatarUri(profile.photoUrl);
+    }
+  }, [profile]);
 
   React.useEffect((): void => {
     navigation.setOptions({
@@ -100,7 +80,6 @@ export const SettingsModal: React.FC = observer((): React.ReactElement => {
       return;
     }
 
-    setSaving(true);
     const formData = new FormData();
     formData.append('name', name.trim());
     formData.append('bio', bio.trim());
@@ -112,21 +91,19 @@ export const SettingsModal: React.FC = observer((): React.ReactElement => {
       } as unknown as Blob);
     }
 
-    api
-      .updateProfile(formData)
-      .then((profile: UserProfile): void => {
-        sessionStore.setProfile(profile);
+    updateProfileMutation.mutate(formData, {
+      onSuccess: () => {
         navigation.goBack();
-      })
-      .catch((): void => {
+      },
+      onError: () => {
         Alert.alert('Error', 'No se pudieron guardar los cambios.');
-      })
-      .finally((): void => setSaving(false));
-  }, [name, bio, newAvatarFile, api, sessionStore, navigation]);
+      },
+    });
+  }, [name, bio, newAvatarFile, updateProfileMutation, navigation]);
 
   return (
     <View style={styles.container}>
-      {loading ? (
+      {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.primaryColor} />
         </View>
@@ -175,9 +152,9 @@ export const SettingsModal: React.FC = observer((): React.ReactElement => {
           <TouchableOpacity
             style={styles.saveButton}
             onPress={handleSave}
-            disabled={saving}
+            disabled={updateProfileMutation.isPending}
           >
-            {saving ? (
+            {updateProfileMutation.isPending ? (
               <ActivityIndicator color={theme.contrastTextColor} />
             ) : (
               <Text style={styles.saveButtonText}>Guardar</Text>
@@ -187,7 +164,7 @@ export const SettingsModal: React.FC = observer((): React.ReactElement => {
       )}
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   container: {

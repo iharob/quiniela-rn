@@ -3,7 +3,6 @@ import { GOOGLE_WEB_CLIENT_ID, setApiUrl } from '@app/config';
 import { Api, ApiContext } from '@app/context/api';
 import {
   TournamentConfigStore,
-  TournamentConfigStoreContext,
 } from '@app/mobx/tournamentConfigStore';
 import { MainNavigator } from '@app/screens/main';
 import { ThemeProvider } from '@app/theme/ThemeContext';
@@ -22,9 +21,11 @@ import {
 import React from 'react';
 import { StatusBar, StyleSheet, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const apiInstance = new Api();
 const tournamentConfigStore = new TournamentConfigStore();
+const queryClient = new QueryClient();
 
 GoogleSignin.configure({
   webClientId: GOOGLE_WEB_CLIENT_ID,
@@ -114,19 +115,21 @@ const App: React.FC = (): React.ReactElement => {
   }
 
   return (
-    <ThemeProvider theme={config.theme}>
-      <ApiContext.Provider value={apiInstance}>
-        <SafeAreaView style={containerStyle}>
-          <StatusBar
-            backgroundColor={theme.cardColor}
-            barStyle={barStyleLightContent}
-          />
-          <NavigationContainer theme={applicationTheme}>
-            <MainNavigator />
-          </NavigationContainer>
-        </SafeAreaView>
-      </ApiContext.Provider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={config.theme}>
+        <ApiContext.Provider value={apiInstance}>
+          <SafeAreaView style={containerStyle}>
+            <StatusBar
+              backgroundColor={theme.cardColor}
+              barStyle={barStyleLightContent}
+            />
+            <NavigationContainer theme={applicationTheme}>
+              <MainNavigator />
+            </NavigationContainer>
+          </SafeAreaView>
+        </ApiContext.Provider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
