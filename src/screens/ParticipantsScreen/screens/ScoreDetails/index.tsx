@@ -31,6 +31,7 @@ import {
   View,
 } from 'react-native';
 import { BackButton } from '@app/components/BackButton.tsx';
+import { DownloadPdfButton } from '@app/screens/ParticipantsScreen/screens/ScoreDetails/downloadPdfButton';
 
 interface Props {
   readonly route: RouteProp<StackParamsList, 'UserScoreDetails'>;
@@ -54,7 +55,12 @@ export const ScoreDetails: React.FC<Props> = (
       ),
       headerTintColor: '#fff',
       headerLeft: BackButton,
+      headerRight: (): React.ReactNode => <DownloadPdfButton userId={userId} />,
       headerLeftContainerStyle: {
+        paddingRight: 10,
+        paddingLeft: 10,
+      },
+      headerRightContainerStyle: {
         paddingRight: 10,
         paddingLeft: 10,
       },
@@ -66,7 +72,7 @@ export const ScoreDetails: React.FC<Props> = (
         headerShown: false,
       });
     };
-  }, [navigation, theme.contrastTextColor]);
+  }, [navigation, theme.contrastTextColor, userId]);
 
   const sections = React.useMemo(
     (): readonly SectionType[] => computeSections(pointsDetails),

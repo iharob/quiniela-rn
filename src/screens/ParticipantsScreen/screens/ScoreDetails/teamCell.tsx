@@ -1,18 +1,17 @@
 import { TeamItem } from '@app/components/teamItem';
-import { useTheme } from '@app/theme/ThemeContext';
 import { Team } from '@app/types/game';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 interface Props {
   readonly predicted: Team;
-  readonly actual: Team;
+  readonly actual: Team | null;
   readonly direction?: 'normal' | 'reverse';
 }
 
 export const TeamCell: React.FC<Props> = (props: Props): React.ReactElement => {
   const { predicted, actual, direction = 'normal' } = props;
-  const matched = predicted.country === actual.country;
+  const matched = actual !== null ? predicted.country === actual.country : true;
 
   return (
     <View style={styles.teamContainer}>
@@ -23,9 +22,11 @@ export const TeamCell: React.FC<Props> = (props: Props): React.ReactElement => {
           strikethrough={!matched}
         />
       </View>
-      <View style={[styles.actualRow]}>
-        {!matched && <TeamItem team={actual} direction={direction} />}
-      </View>
+      {actual !== null && (
+        <View style={[styles.actualRow]}>
+          {!matched && <TeamItem team={actual} direction={direction} />}
+        </View>
+      )}
     </View>
   );
 };

@@ -19,10 +19,10 @@ export interface PredictedResult {
   readonly predictedScoreTeam1: number;
   readonly predictedScoreTeam2: number;
   readonly predictedWinner: string;
-  readonly actualTeam1: Team;
-  readonly actualTeam2: Team;
-  readonly actualScoreTeam1: number;
-  readonly actualScoreTeam2: number;
+  readonly actualTeam1: Team | null;
+  readonly actualTeam2: Team | null;
+  readonly actualScoreTeam1: number | null;
+  readonly actualScoreTeam2: number | null;
   readonly actualWinner: string;
   readonly matchPoints: number;
   readonly total: number;

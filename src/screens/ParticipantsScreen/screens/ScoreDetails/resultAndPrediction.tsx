@@ -14,6 +14,15 @@ const ResultAndPrediction: React.FC<Props> = (
 ): React.ReactElement => {
   const { item } = props;
 
+  const hasActualScore = React.useMemo(
+    (): boolean =>
+      item.actualTeam1 !== null &&
+      item.actualTeam2 !== null &&
+      item.actualScoreTeam1 !== null &&
+      item.actualScoreTeam2 !== null,
+    [item],
+  );
+
   return (
     <ListItemBase added={item.matchPoints} total={item.total}>
       <View style={styles.container}>
@@ -25,17 +34,19 @@ const ResultAndPrediction: React.FC<Props> = (
               <Text style={styles.scoreSeparator}>&mdash;</Text>
               <Text style={styles.score}>{item.predictedScoreTeam2}</Text>
             </View>
-            <View style={[styles.scoreContainer, styles.actualRow]}>
-              <Text style={[styles.score, styles.actualText]}>
-                {item.actualScoreTeam1}
-              </Text>
-              <Text style={[styles.scoreSeparator, styles.actualText]}>
-                &mdash;
-              </Text>
-              <Text style={[styles.score, styles.actualText]}>
-                {item.actualScoreTeam2}
-              </Text>
-            </View>
+            {hasActualScore && (
+              <View style={[styles.scoreContainer, styles.actualRow]}>
+                <Text style={[styles.score, styles.actualText]}>
+                  {item.actualScoreTeam1}
+                </Text>
+                <Text style={[styles.scoreSeparator, styles.actualText]}>
+                  &mdash;
+                </Text>
+                <Text style={[styles.score, styles.actualText]}>
+                  {item.actualScoreTeam2}
+                </Text>
+              </View>
+            )}
           </View>
           <TeamCell
             predicted={item.predictedTeam2}

@@ -123,7 +123,7 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
         keyboardShouldPersistTaps="handled"
       >
         <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
-          <Text style={backTextStyle}>{'\u2190'} Volver</Text>
+          <Text style={backTextStyle}>{'←'} Volver</Text>
         </TouchableOpacity>
 
         <Text style={titleStyle}>Crear cuenta</Text>

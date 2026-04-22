@@ -14,6 +14,7 @@ import { TournamentConfig } from '@app/types/tournamentConfig';
 import { simulateGroupScore } from '@app/utils/simulate';
 import axios, { AxiosResponse } from 'axios';
 import React from 'react';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 interface PredictionPayload {
   readonly groups: readonly GroupWithResults[];
@@ -141,6 +142,22 @@ export class Api {
     }
 
     return response.data;
+  };
+
+  public downloadUserScorePDF = async (userID: number): Promise<string> => {
+    const response = await ReactNativeBlobUtil.config({
+      fileCache: true,
+      appendExt: 'pdf',
+    }).fetch('GET', `${this.url}/prediction/${userID}/pdf`, {
+      Authorization: 'Bearer ' + this.bearerToken,
+      Accept: 'application/pdf',
+    });
+
+    if (response.info().status !== 200) {
+      throw new Error('No se pudo descargar el PDF');
+    }
+
+    return response.path();
   };
 
   public sendPrediction = async (

@@ -148,7 +148,7 @@
   },
   {
     "rank": 22,
-    "name": "T\u00fcrkiye",
+    "name": "Türkiye",
     "iso2": "TR",
     "points": 1599.04,
     "confederation": "UEFA"
@@ -232,7 +232,7 @@
   },
   {
     "rank": 34,
-    "name": "C\u00f4te d'Ivoire",
+    "name": "Côte d'Ivoire",
     "iso2": "CI",
     "points": 1532.98,
     "confederation": "CAF"
@@ -568,7 +568,7 @@
   },
   {
     "rank": 82,
-    "name": "Cura\u00e7ao",
+    "name": "Curaçao",
     "iso2": "CW",
     "points": 1294.65,
     "confederation": "CONCACAF"
@@ -1366,7 +1366,7 @@
   },
   {
     "rank": 196,
-    "name": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+    "name": "São Tomé and Príncipe",
     "iso2": "ST",
     "points": 855.44,
     "confederation": "CAF"

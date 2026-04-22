@@ -55,18 +55,18 @@ export const EmailLoginScreen: React.FC<Props> = (
           if (axios.isAxiosError(e)) {
             const status = e.response?.status;
             if (status === 401) {
-              setError('Correo o contrase\u00f1a incorrectos');
+              setError('Correo o contraseña incorrectos');
             } else if (status === 409) {
               setError(
-                'Esta cuenta usa Google Sign-In. Us\u00e1 el bot\u00f3n de Google para iniciar sesi\u00f3n.',
+                'Esta cuenta usa Google Sign-In. Usá el botón de Google para iniciar sesión.',
               );
             } else {
               setError(
-                'No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.',
+                'No pudimos iniciar sesión. Intentá de nuevo.',
               );
             }
           } else {
-            setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
+            setError('No pudimos iniciar sesión. Intentá de nuevo.');
           }
         },
       },
@@ -124,14 +124,14 @@ export const EmailLoginScreen: React.FC<Props> = (
           onPress={onBack}
           activeOpacity={0.7}
         >
-          <Text style={backTextStyle}>{'\u2190'} Volver</Text>
+          <Text style={backTextStyle}>{'←'} Volver</Text>
         </TouchableOpacity>
 
         <Text style={titleStyle}>Iniciar sesi&oacute;n</Text>
 
         <TextInput
           style={inputStyle}
-          placeholder="Correo electr\u00f3nico"
+          placeholder="Correo electrónico"
           placeholderTextColor={theme.placeholderTextColor}
           value={email}
           onChangeText={setEmail}
@@ -145,7 +145,7 @@ export const EmailLoginScreen: React.FC<Props> = (
         <TextInput
           ref={passwordRef}
           style={inputStyle}
-          placeholder="Contrase\u00f1a"
+          placeholder="Contraseña"
           placeholderTextColor={theme.placeholderTextColor}
           value={password}
           onChangeText={setPassword}

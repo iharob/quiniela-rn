@@ -23,14 +23,19 @@ export const ListItem: React.FC<Props> = (props: Props): React.ReactElement => {
   );
 
   const subtitleStyle = React.useMemo(
-    (): TextStyle => ({ ...styles.subtitleText, color: theme.placeholderTextColor }),
+    (): TextStyle => ({
+      ...styles.subtitleText,
+      color: theme.placeholderTextColor,
+    }),
     [theme.placeholderTextColor],
   );
 
   return (
     <View key={item.userID} style={styles.listItem}>
       <View style={styles.currentRankContainer}>
-        <Text style={styles.rankCell}>{item.currentRank ?? '0'}</Text>
+        <Text style={styles.rankCell}>
+          {item.currentRank === 0 ? '' : item.currentRank}
+        </Text>
       </View>
       <View style={styles.rankUpdateIcon}>
         {item.rankDifference > 0 ? (
@@ -42,9 +47,12 @@ export const ListItem: React.FC<Props> = (props: Props): React.ReactElement => {
       <Avatar name={item.userName} uri={item.photoUrl} />
       <View style={styles.nameContainer}>
         <Text style={userNameStyle}>{item.userName}</Text>
-        <Text style={subtitleStyle}>{item.bio ?? '\u2014'}</Text>
+        <Text style={subtitleStyle}>{item.bio ?? '—'}</Text>
       </View>
-      <ScoreCell score={item.totalScore} difference={item.totalScoreDifference} />
+      <ScoreCell
+        score={item.totalScore}
+        difference={item.totalScoreDifference}
+      />
     </View>
   );
 };
