@@ -111,7 +111,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
             source={require('@app/images/logo.png')}
             style={styles.fullscreenLogo}
           />
-          <Text style={styles.tournamentName}>Compa del mundo 2026</Text>
+          <Text style={styles.tournamentName}>Quiniela Mundial 2026</Text>
         </View>
         <TouchableOpacity
           style={styles.googleButton}
@@ -127,12 +127,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
           <Text style={styles.googleButtonText}>Iniciar sesión con Google</Text>
         </TouchableOpacity>
         <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>o</Text>
-          <View style={styles.dividerLine} />
+          <View
+            style={[styles.dividerLine, { backgroundColor: theme.borderColor }]}
+          />
+          <Text style={[styles.dividerText, { color: theme.textColor }]}>
+            o
+          </Text>
+          <View
+            style={[styles.dividerLine, { backgroundColor: theme.borderColor }]}
+          />
         </View>
         <TouchableOpacity onPress={onNavigateToRegister} activeOpacity={0.7}>
-          <Text style={styles.linkText}>Registrarse con email</Text>
+          <Text style={[styles.linkText, { color: theme.primaryColor }]}>
+            Registrarse con email
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onNavigateToLogin} activeOpacity={0.7}>
           <Text style={[styles.linkText, { color: theme.primaryColor }]}>
@@ -160,6 +168,8 @@ const styles = StyleSheet.create({
   fullscreenLogo: {
     height: logoHeight,
     width: logoWidth,
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   googleButton: {
     flexDirection: 'row',
@@ -200,8 +210,7 @@ const styles = StyleSheet.create({
   },
   dividerLine: {
     flex: 1,
-    height: StyleSheet.hairlineWidth,
-    opacity: 0.3,
+    height: 1,
   },
   dividerText: {
     marginHorizontal: 12,

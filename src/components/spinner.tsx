@@ -1,6 +1,12 @@
 import { useTheme } from '@app/theme/ThemeContext';
 import React from 'react';
-import { ActivityIndicator, Modal, StatusBar, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 interface Props {
   readonly visible: boolean;
@@ -31,7 +37,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },

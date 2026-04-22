@@ -1,9 +1,6 @@
-import { FullScreenLogo } from '@app/components/fullScreenLogo';
 import { GOOGLE_WEB_CLIENT_ID, setApiUrl } from '@app/config';
 import { Api, ApiContext } from '@app/context/api';
-import {
-  TournamentConfigStore,
-} from '@app/mobx/tournamentConfigStore';
+import { TournamentConfigStore } from '@app/mobx/tournamentConfigStore';
 import { MainNavigator } from '@app/screens/main';
 import { ThemeProvider } from '@app/theme/ThemeContext';
 import {
@@ -12,16 +9,15 @@ import {
   TournamentTheme,
 } from '@app/types/tournamentConfig';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { barStyleLightContent } from '@app/constants';
 import {
   DefaultTheme,
   NavigationContainer,
   Theme,
 } from '@react-navigation/native';
 import React from 'react';
-import { StatusBar, StyleSheet, ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SplashScreen } from '@app/components/SplashScreen.tsx';
 
 const apiInstance = new Api();
 const tournamentConfigStore = new TournamentConfigStore();
@@ -92,41 +88,19 @@ const App: React.FC = (): React.ReactElement => {
     };
   }, [theme]);
 
-  const containerStyle = React.useMemo(
-    (): ViewStyle => ({
-      ...styles.container,
-      backgroundColor: theme.cardColor,
-    }),
-    [theme.cardColor],
-  );
-
   if (!configLoaded) {
-    return (
-      <ThemeProvider theme={config.theme}>
-        <SafeAreaView style={containerStyle}>
-          <StatusBar
-            backgroundColor={config.theme.cardColor}
-            barStyle={barStyleLightContent}
-          />
-          <FullScreenLogo />
-        </SafeAreaView>
-      </ThemeProvider>
-    );
+    return <SplashScreen />;
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={config.theme}>
         <ApiContext.Provider value={apiInstance}>
-          <SafeAreaView style={containerStyle}>
-            <StatusBar
-              backgroundColor={theme.cardColor}
-              barStyle={barStyleLightContent}
-            />
+          <View style={styles.container}>
             <NavigationContainer theme={applicationTheme}>
               <MainNavigator />
             </NavigationContainer>
-          </SafeAreaView>
+          </View>
         </ApiContext.Provider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -1,15 +1,21 @@
-import { FullScreenLogo } from '@app/components/fullScreenLogo';
-import { barStyleLightContent } from '@app/constants';
+import { SplashScreen } from '@app/components/SplashScreen.tsx';
 import { Api, useApi } from '@app/context/api';
-import { SessionStore, SessionStoreContext, UserSession } from '@app/mobx/sessionStore';
+import {
+  SessionStore,
+  SessionStoreContext,
+  UserSession,
+} from '@app/mobx/sessionStore';
 import { ParticipantsScreen } from '@app/screens/ParticipantsScreen';
 import { PredictScreen } from '@app/screens/PredictScreen';
 import { AuthScreen } from '@app/screens/WelcomeScreen/AuthScreen';
 import { useTheme } from '@app/theme/ThemeContext';
+import { defaultTheme } from '@app/types/tournamentConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { observer } from 'mobx-react';
 import React from 'react';
-import { StatusBar, View } from 'react-native';
+import { View, ViewStyle } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 export const MainNavigator: React.FC = observer((): React.ReactElement => {
   const api = useApi();
@@ -27,14 +33,16 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
         return;
       }
 
-      const session: Omit<UserSession, 'token'> | null = await api.loadSession();
-      if (session !== null) {
+      const loadedSession: Omit<UserSession, 'token'> | null =
+        await api.loadSession();
+
+      if (loadedSession !== null) {
         setTimeout((): void => {
           sessionStore.setSession({
-            userId: session.userId,
+            userId: loadedSession.userId,
             token: savedToken,
-            predicted: session.predicted,
-            payed: session.payed,
+            predicted: loadedSession.predicted,
+            payed: loadedSession.payed,
           });
         }, 0);
       } else {
@@ -54,46 +62,61 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
     });
   }, [api, initialize]);
 
+  const authContainerStyle = React.useMemo(
+    (): ViewStyle => ({
+      flex: 1,
+      backgroundColor: defaultTheme.backgroundColor,
+    }),
+    [],
+  );
+
+  const authenticatedContainerStyle = React.useMemo(
+    (): ViewStyle => ({
+      flex: 1,
+      backgroundColor: theme.cardColor,
+    }),
+    [theme.cardColor],
+  );
+
   if (loading) {
-    return <FullScreenLogo />;
+    return <SplashScreen />;
   }
 
   if (!session) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <StatusBar backgroundColor={theme.cardColor} barStyle={barStyleLightContent} />
-        <AuthScreen />
+        <SafeAreaView style={authContainerStyle}>
+          <SystemBars style="dark" />
+          <AuthScreen />
+        </SafeAreaView>
       </SessionStoreContext.Provider>
     );
   } else if (session.predicted) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <StatusBar
-          backgroundColor={theme.cardColor}
-          barStyle={barStyleLightContent}
-        />
-        <View style={styles.flex}>
-          <ParticipantsScreen />
-        </View>
+        <SafeAreaView style={authenticatedContainerStyle}>
+          <SystemBars style="light" />
+          <View style={styles.flex}>
+            <ParticipantsScreen />
+          </View>
+        </SafeAreaView>
       </SessionStoreContext.Provider>
     );
   } else if (!session.predicted) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <StatusBar
-          backgroundColor={theme.cardColor}
-          barStyle={barStyleLightContent}
-        />
-        <View style={styles.flex}>
-          <PredictScreen />
-        </View>
+        <SafeAreaView style={authenticatedContainerStyle}>
+          <SystemBars style="light" />
+          <View style={styles.flex}>
+            <PredictScreen />
+          </View>
+        </SafeAreaView>
       </SessionStoreContext.Provider>
     );
-  } else {
-    return <FullScreenLogo />;
   }
+
+  return <></>;
 });
 
 const styles = { flex: { flex: 1 } as const };
 const sessionStore = new SessionStore();
-

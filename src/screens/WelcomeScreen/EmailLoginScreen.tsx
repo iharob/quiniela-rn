@@ -17,7 +17,9 @@ interface Props {
   readonly onBack: () => void;
 }
 
-export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElement => {
+export const EmailLoginScreen: React.FC<Props> = (
+  props: Props,
+): React.ReactElement => {
   const { onBack } = props;
   const theme = useTheme();
 
@@ -29,17 +31,20 @@ export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElem
 
   const passwordRef = React.useRef<TextInput>(null);
 
-  const focusPassword = React.useCallback((): void => passwordRef.current?.focus(), []);
+  const focusPassword = React.useCallback(
+    (): void => passwordRef.current?.focus(),
+    [],
+  );
 
   const handleLogin = React.useCallback(async (): Promise<void> => {
     setError(null);
 
     if (!email.trim() || !password) {
-      setError('Ingres\u00e1 tu correo y contrase\u00f1a');
+      setError('Ingrese su correo y contraseña');
       return;
     }
     if (!email.includes('@') || !email.includes('.')) {
-      setError('El correo electr\u00f3nico no es v\u00e1lido');
+      setError('El correo electrónico no es válido');
       return;
     }
 
@@ -56,7 +61,9 @@ export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElem
                 'Esta cuenta usa Google Sign-In. Us\u00e1 el bot\u00f3n de Google para iniciar sesi\u00f3n.',
               );
             } else {
-              setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
+              setError(
+                'No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.',
+              );
             }
           } else {
             setError('No pudimos iniciar sesi\u00f3n. Intent\u00e1 de nuevo.');
@@ -112,7 +119,11 @@ export const EmailLoginScreen: React.FC<Props> = (props: Props): React.ReactElem
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={onBack}
+          activeOpacity={0.7}
+        >
           <Text style={backTextStyle}>{'\u2190'} Volver</Text>
         </TouchableOpacity>
 
