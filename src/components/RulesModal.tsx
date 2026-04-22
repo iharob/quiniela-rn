@@ -4,7 +4,6 @@ import { faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { BackButton } from '@app/components/BackButton.tsx';
 import { useNavigation } from '@react-navigation/native';
 
 export const RulesModal: React.FC = (): React.ReactElement => {
@@ -13,12 +12,7 @@ export const RulesModal: React.FC = (): React.ReactElement => {
 
   React.useEffect((): void => {
     navigation.setOptions({
-      headerLeft: BackButton,
-      headerRight: null,
-      headerLeftContainerStyle: {
-        paddingRight: 10,
-        paddingLeft: 10,
-      },
+      headerRight: () => null,
     });
   }, [navigation]);
 

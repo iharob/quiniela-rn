@@ -19,9 +19,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { StackHeaderRightProps } from '@react-navigation/stack';
 
-export const HamburgerMenu = (_: StackHeaderRightProps): React.ReactNode => {
+export const HamburgerMenu = (): React.ReactNode => {
   const navigation = useNavigation<any>();
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
@@ -122,15 +121,13 @@ export const HamburgerMenu = (_: StackHeaderRightProps): React.ReactNode => {
           </View>
         </Pressable>
       </Modal>
-
-      {/*<RulesModal visible={rulesVisible} onClose={handleCloseRules} />*/}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
   },
   hamburger: {
     width: 28,

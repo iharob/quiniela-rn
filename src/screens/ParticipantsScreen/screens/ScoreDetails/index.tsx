@@ -22,6 +22,7 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import { HeaderTitleProps } from '@react-navigation/elements';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import {
   SectionList,
@@ -30,7 +31,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { BackButton } from '@app/components/BackButton.tsx';
 import { DownloadPdfButton } from '@app/screens/ParticipantsScreen/screens/ScoreDetails/downloadPdfButton';
 
 interface Props {
@@ -42,11 +42,18 @@ export const ScoreDetails: React.FC<Props> = (
 ): React.ReactElement => {
   const navigation = useNavigation<NavigationProp<StackParamsList>>();
   const theme = useTheme();
+  const queryClient = useQueryClient();
 
   const { route } = props;
   const { userId } = route.params;
 
   const { data: pointsDetails = PointsDetails.empty(), isFetching, refetch } = useUserScoreDetails(userId);
+
+  React.useEffect((): (() => void) => {
+    return navigation.addListener('beforeRemove', (): void => {
+      queryClient.cancelQueries({ queryKey: ['userScoreDetails', userId] });
+    });
+  }, [navigation, queryClient, userId]);
 
   React.useEffect((): void | (() => void) => {
     navigation.setOptions({
@@ -54,16 +61,7 @@ export const ScoreDetails: React.FC<Props> = (
         <HeaderTitle {...props} />
       ),
       headerTintColor: '#fff',
-      headerLeft: BackButton,
       headerRight: (): React.ReactNode => <DownloadPdfButton userId={userId} />,
-      headerLeftContainerStyle: {
-        paddingRight: 10,
-        paddingLeft: 10,
-      },
-      headerRightContainerStyle: {
-        paddingRight: 10,
-        paddingLeft: 10,
-      },
       headerShown: true,
     });
 

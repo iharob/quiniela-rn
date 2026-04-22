@@ -17,7 +17,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { BackButton } from '@app/components/BackButton.tsx';
 
 export const SettingsModal: React.FC = (): React.ReactElement => {
   const navigation = useNavigation();
@@ -45,12 +44,7 @@ export const SettingsModal: React.FC = (): React.ReactElement => {
 
   React.useEffect((): void => {
     navigation.setOptions({
-      headerLeft: BackButton,
-      headerRight: null,
-      headerLeftContainerStyle: {
-        paddingRight: 10,
-        paddingLeft: 10,
-      },
+      headerRight: () => null,
     });
   }, [navigation]);
 

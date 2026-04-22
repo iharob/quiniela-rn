@@ -12,7 +12,7 @@ import { getWinner } from '@app/utils';
 import { buildNextRoundGames, findRound, pairGamesByFeeders } from '@app/utils/brackets';
 import { simulatePair } from '@app/utils/simulate';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { observer } from 'mobx-react';
 import React from 'react';
 import { FlatList, ListRenderItemInfo, StatusBar, StyleSheet, View } from 'react-native';
@@ -25,7 +25,7 @@ interface Props {
 export const KnockoutRoundView: React.FC<Props> = observer((props: Props): React.ReactElement => {
   const { games, round } = props;
 
-  const navigation = useNavigation<StackNavigationProp<PredictionStackParamsList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<PredictionStackParamsList>>();
   const theme = useTheme();
   const knockoutStore = useKnockoutPhaseStore();
 

@@ -3,10 +3,9 @@ import { HamburgerMenu } from '@app/components/hamburgerMenu';
 import { ScoreDetails } from '@app/screens/ParticipantsScreen/screens/ScoreDetails';
 import { TabbedView } from '@app/screens/ParticipantsScreen/screens/TabbedView';
 import {
-  createStackNavigator,
-  StackHeaderRightProps,
-  StackNavigationOptions,
-} from '@react-navigation/stack';
+  createNativeStackNavigator,
+  NativeStackNavigationOptions,
+} from '@react-navigation/native-stack';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { RulesModal } from '@app/components/RulesModal.tsx';
@@ -23,16 +22,14 @@ export type StackParamsList = {
   Rules: undefined;
 };
 
-const Stack = createStackNavigator<StackParamsList>();
+const Stack = createNativeStackNavigator<StackParamsList>();
 
 export const ParticipantsScreen: React.FC = (): React.ReactElement => {
   const screenOptions = React.useMemo(
-    (): StackNavigationOptions => ({
+    (): NativeStackNavigationOptions => ({
       title: 'Quiniela Mundial 2026',
       headerShown: true,
-      headerRight: (props: StackHeaderRightProps): React.ReactNode => (
-        <HamburgerMenu {...props} />
-      ),
+      headerRight: (): React.ReactNode => <HamburgerMenu />,
       headerTintColor: 'white',
     }),
     [],

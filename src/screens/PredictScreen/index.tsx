@@ -12,10 +12,9 @@ import { Groups } from '@app/screens/PredictScreen/screens/GroupsScreen';
 import { GameWithResult } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
 import { useTheme } from '@app/theme/ThemeContext';
 import {
-  createStackNavigator,
-  StackHeaderRightProps,
-  StackNavigationOptions,
-} from '@react-navigation/stack';
+  createNativeStackNavigator,
+  NativeStackNavigationOptions,
+} from '@react-navigation/native-stack';
 import React from 'react';
 import { GenericKnockout } from '@app/screens/PredictScreen/screens/GenericKnockout';
 
@@ -56,12 +55,10 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
   }, [knockoutStore]);
 
   const screenOptions = React.useMemo(
-    (): StackNavigationOptions => ({
+    (): NativeStackNavigationOptions => ({
       title: '',
       headerShown: true,
-      headerRight: (props: StackHeaderRightProps): React.ReactNode => (
-        <HamburgerMenu {...props} />
-      ),
+      headerRight: (): React.ReactNode => <HamburgerMenu />,
       headerTintColor: theme.contrastTextColor,
     }),
     [theme.contrastTextColor],
@@ -91,4 +88,4 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
   );
 };
 
-const RegistrationRoutes = createStackNavigator<PredictionStackParamsList>();
+const RegistrationRoutes = createNativeStackNavigator<PredictionStackParamsList>();

@@ -12,7 +12,6 @@ import { useTheme } from '@app/theme/ThemeContext';
 import { ClassificationGroup } from '@app/types/classifications';
 import { findRound, pairMatchesByFeeders } from '@app/utils/brackets';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { StackHeaderRightProps } from '@react-navigation/stack';
 import { noop } from 'mobx/src/utils/utils';
 import { observer } from 'mobx-react';
 import React from 'react';
@@ -124,9 +123,7 @@ export const Groups: React.FC = observer((): React.ReactElement => {
     navigation.setOptions({
       title: `Completado ${completed}/${total}`,
       headerLeft: null,
-      headerRight: (props: StackHeaderRightProps): React.ReactNode => (
-        <HamburgerMenu {...props} />
-      ),
+      headerRight: (): React.ReactNode => <HamburgerMenu />,
       headerTintColor: theme.contrastTextColor,
       headerStyle: headerStyle,
     });

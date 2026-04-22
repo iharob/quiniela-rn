@@ -70,14 +70,6 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
     [],
   );
 
-  const authenticatedContainerStyle = React.useMemo(
-    (): ViewStyle => ({
-      flex: 1,
-      backgroundColor: theme.cardColor,
-    }),
-    [theme.cardColor],
-  );
-
   if (loading) {
     return <SplashScreen />;
   }
@@ -94,23 +86,19 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
   } else if (session.predicted) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <SafeAreaView style={authenticatedContainerStyle}>
-          <SystemBars style="light" />
-          <View style={styles.flex}>
-            <ParticipantsScreen />
-          </View>
-        </SafeAreaView>
+        <SystemBars style="light" />
+        <View style={styles.flex}>
+          <ParticipantsScreen />
+        </View>
       </SessionStoreContext.Provider>
     );
   } else if (!session.predicted) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <SafeAreaView style={authenticatedContainerStyle}>
-          <SystemBars style="light" />
-          <View style={styles.flex}>
-            <PredictScreen />
-          </View>
-        </SafeAreaView>
+        <SystemBars style="light" />
+        <View style={styles.flex}>
+          <PredictScreen />
+        </View>
       </SessionStoreContext.Provider>
     );
   }
