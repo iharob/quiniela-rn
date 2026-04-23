@@ -4,7 +4,7 @@ export interface GameWithResult extends Game {
   readonly team1Score: number | null;
   readonly team2Score: number | null;
 
-  readonly winner: Team | null;
+  readonly winner: Team | null | undefined;
 }
 
 export interface GroupWithResults {

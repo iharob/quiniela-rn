@@ -324,6 +324,7 @@ export class Api {
             date: game.date,
             team1Score: SIMULATE ? simulated.team1Score : null,
             team2Score: SIMULATE ? simulated.team2Score : null,
+            winner: null,
           };
         }),
       };
