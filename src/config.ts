@@ -1,4 +1,4 @@
-const remoteBootstrap = 'https://api.iaales.lat';
+const remoteBootstrap = 'https://iaales.lat';
 const localBootstrap = 'http://localhost:8000';
 
 const BOOTSTRAP_URL = __DEV__ ? localBootstrap : remoteBootstrap;
