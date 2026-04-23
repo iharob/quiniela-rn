@@ -1,5 +1,4 @@
 import {
-  faMessage,
   faSatelliteDish,
   faTrophy,
   IconDefinition,
@@ -22,4 +21,3 @@ const TabIcon = (icon: IconDefinition): TabBarIconComponent =>
 
 export const RankingsIcon = TabIcon(faTrophy);
 export const OngoingIcon = TabIcon(faSatelliteDish);
-export const ChatIcon = TabIcon(faMessage);

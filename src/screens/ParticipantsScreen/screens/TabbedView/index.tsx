@@ -1,8 +1,6 @@
 import { useLogout } from '@app/hooks/useLogout';
-import { Chat } from '@app/screens/ParticipantsScreen/screens/Chat';
 import { Ongoing } from '@app/screens/ParticipantsScreen/screens/Ongoing';
 import {
-  ChatIcon,
   OngoingIcon,
   RankingsIcon,
   TabBarIconComponent,
@@ -63,11 +61,6 @@ export const TabbedView: React.FC = (): React.ReactElement => {
         name: 'Jugando',
         component: Ongoing,
         icon: OngoingIcon,
-      },
-      {
-        name: 'Chat',
-        component: Chat,
-        icon: ChatIcon,
       },
     ],
     [],
