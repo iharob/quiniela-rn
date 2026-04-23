@@ -12,18 +12,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   currentRankContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'center',
-    width: 28,
+    width: 20,
   },
   rankCell: {
-    textAlign: 'center',
+    textAlign: 'right',
     fontWeight: 'bold',
     fontSize: 16,
   },
   rankUpdateIcon: {
-    width: 18,
+    width: 16,
     alignItems: 'center',
+    marginHorizontal: 8,
   },
   downloadIcon: {
     alignItems: 'center',
