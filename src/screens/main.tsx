@@ -8,19 +8,21 @@ import {
 import { ParticipantsScreen } from '@app/screens/ParticipantsScreen';
 import { PredictScreen } from '@app/screens/PredictScreen';
 import { AuthScreen } from '@app/screens/WelcomeScreen/AuthScreen';
-import { useTheme } from '@app/theme/ThemeContext';
-import { defaultTheme } from '@app/types/tournamentConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { observer } from 'mobx-react';
 import React from 'react';
-import { View, ViewStyle } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet } from 'react-native';
+import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import { SystemBars } from 'react-native-edge-to-edge';
+import { useThemedStyles } from '@app/theme/useThemedStyles';
+import { TournamentTheme } from '@app/types/tournamentConfig';
+
+const AUTH_EDGES: readonly Edge[] = ['bottom', 'left', 'right'];
 
 export const MainNavigator: React.FC = observer((): React.ReactElement => {
   const api = useApi();
   const { session } = sessionStore;
-  const theme = useTheme();
+  const themedStyles = useThemedStyles(themedStylesFactory);
 
   const [loading, setLoading] = React.useState<boolean>(true);
 
@@ -62,14 +64,6 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
     });
   }, [api, initialize]);
 
-  const authContainerStyle = React.useMemo(
-    (): ViewStyle => ({
-      flex: 1,
-      backgroundColor: defaultTheme.backgroundColor,
-    }),
-    [],
-  );
-
   if (loading) {
     return <SplashScreen />;
   }
@@ -77,7 +71,7 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
   if (!session) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
-        <SafeAreaView style={authContainerStyle}>
+        <SafeAreaView style={themedStyles.authContainer}>
           <SystemBars style="dark" />
           <AuthScreen />
         </SafeAreaView>
@@ -87,18 +81,18 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
         <SystemBars style="light" />
-        <View style={styles.flex}>
+        <SafeAreaView style={themedStyles.tabbed} edges={AUTH_EDGES}>
           <ParticipantsScreen />
-        </View>
+        </SafeAreaView>
       </SessionStoreContext.Provider>
     );
   } else if (!session.predicted) {
     return (
       <SessionStoreContext.Provider value={sessionStore}>
         <SystemBars style="light" />
-        <View style={styles.flex}>
+        <SafeAreaView style={themedStyles.plain} edges={AUTH_EDGES}>
           <PredictScreen />
-        </View>
+        </SafeAreaView>
       </SessionStoreContext.Provider>
     );
   }
@@ -106,5 +100,19 @@ export const MainNavigator: React.FC = observer((): React.ReactElement => {
   return <></>;
 });
 
-const styles = { flex: { flex: 1 } as const };
+const themedStylesFactory = (theme: TournamentTheme) =>
+  StyleSheet.create({
+    authContainer: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+    },
+    tabbed: {
+      flex: 1,
+      backgroundColor: theme.cardColor,
+    },
+    plain: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+    },
+  });
 const sessionStore = new SessionStore();

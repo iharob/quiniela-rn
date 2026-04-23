@@ -1,6 +1,8 @@
 import { Spinner } from '@app/components/spinner';
 import { useEmailRegisterMutation } from '@app/hooks/mutations';
 import { useTheme } from '@app/theme/ThemeContext';
+import { useThemedStyles } from '@app/theme/useThemedStyles';
+import { TournamentTheme } from '@app/types/tournamentConfig';
 import axios from 'axios';
 import React from 'react';
 import {
@@ -8,9 +10,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TextStyle,
   TouchableOpacity,
-  ViewStyle,
 } from 'react-native';
 
 interface Props {
@@ -20,6 +20,7 @@ interface Props {
 export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactElement => {
   const { onBack } = props;
   const theme = useTheme();
+  const themedStyles = useThemedStyles(themedStylesFactory);
 
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
@@ -76,60 +77,21 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
     );
   }, [name, email, password, confirmPassword, registerMutation]);
 
-  const inputStyle = React.useMemo(
-    (): TextStyle => ({
-      height: 50,
-      borderWidth: 1,
-      borderColor: theme.borderColor,
-      borderRadius: 8,
-      paddingHorizontal: 16,
-      marginBottom: 12,
-      color: theme.textColor,
-      fontSize: 14,
-    }),
-    [theme.borderColor, theme.textColor],
-  );
-
-  const titleStyle = React.useMemo(
-    (): TextStyle => ({
-      ...styles.title,
-      color: theme.primaryColor,
-    }),
-    [theme.primaryColor],
-  );
-
-  const backTextStyle = React.useMemo(
-    (): TextStyle => ({
-      ...styles.backText,
-      color: theme.primaryColor,
-    }),
-    [theme.primaryColor],
-  );
-
-  const buttonStyle = React.useMemo(
-    (): ViewStyle => ({
-      ...styles.button,
-      backgroundColor: theme.primaryColor,
-      opacity: registerMutation.isPending ? 0.5 : 1,
-    }),
-    [theme.primaryColor, registerMutation.isPending],
-  );
-
   return (
     <>
       <ScrollView
-        style={[styles.scroll, { backgroundColor: theme.backgroundColor }]}
+        style={themedStyles.scroll}
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
         <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
-          <Text style={backTextStyle}>{'←'} Volver</Text>
+          <Text style={themedStyles.backText}>{'←'} Volver</Text>
         </TouchableOpacity>
 
-        <Text style={titleStyle}>Crear cuenta</Text>
+        <Text style={themedStyles.title}>Crear cuenta</Text>
 
         <TextInput
-          style={inputStyle}
+          style={themedStyles.input}
           placeholder="Nombre"
           placeholderTextColor={theme.placeholderTextColor}
           value={name}
@@ -142,7 +104,7 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
         />
         <TextInput
           ref={emailRef}
-          style={inputStyle}
+          style={themedStyles.input}
           placeholder="Correo electrónico"
           placeholderTextColor={theme.placeholderTextColor}
           value={email}
@@ -156,7 +118,7 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
         />
         <TextInput
           ref={passwordRef}
-          style={inputStyle}
+          style={themedStyles.input}
           placeholder="Contraseña"
           placeholderTextColor={theme.placeholderTextColor}
           value={password}
@@ -169,7 +131,7 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
         />
         <TextInput
           ref={confirmPasswordRef}
-          style={inputStyle}
+          style={themedStyles.input}
           placeholder="Confirmar contraseña"
           placeholderTextColor={theme.placeholderTextColor}
           value={confirmPassword}
@@ -181,7 +143,7 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
         />
 
         <TouchableOpacity
-          style={buttonStyle}
+          style={[themedStyles.button, registerMutation.isPending && styles.buttonPending]}
           onPress={handleRegister}
           disabled={registerMutation.isPending}
           activeOpacity={0.85}
@@ -196,10 +158,44 @@ export const EmailRegisterScreen: React.FC<Props> = (props: Props): React.ReactE
   );
 };
 
+const themedStylesFactory = (theme: TournamentTheme) =>
+  StyleSheet.create({
+    scroll: {
+      flex: 1,
+      backgroundColor: theme.backgroundColor,
+    },
+    backText: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: theme.primaryColor,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      marginBottom: 24,
+      color: theme.primaryColor,
+    },
+    input: {
+      height: 50,
+      borderWidth: 1,
+      borderColor: theme.borderColor,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      marginBottom: 12,
+      color: theme.textColor,
+      fontSize: 14,
+    },
+    button: {
+      height: 50,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 4,
+      backgroundColor: theme.primaryColor,
+    },
+  });
+
 const styles = StyleSheet.create({
-  scroll: {
-    flex: 1,
-  },
   container: {
     padding: 30,
     paddingTop: 50,
@@ -207,21 +203,8 @@ const styles = StyleSheet.create({
   backButton: {
     marginBottom: 24,
   },
-  backText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 24,
-  },
-  button: {
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 4,
+  buttonPending: {
+    opacity: 0.5,
   },
   buttonText: {
     color: 'white',

@@ -1,5 +1,7 @@
 import { defaultRules } from '@app/rules';
 import { useTheme } from '@app/theme/ThemeContext';
+import { useThemedStyles } from '@app/theme/useThemedStyles';
+import { TournamentTheme } from '@app/types/tournamentConfig';
 import { faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React from 'react';
@@ -9,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 export const RulesModal: React.FC = (): React.ReactElement => {
   const navigation = useNavigation();
   const theme = useTheme();
+  const themedStyles = useThemedStyles(themedStylesFactory);
 
   React.useEffect((): void => {
     navigation.setOptions({
@@ -38,7 +41,7 @@ export const RulesModal: React.FC = (): React.ReactElement => {
             color={theme.primaryColor}
             style={styles.footerIcon}
           />
-          <Text style={[styles.footerText, { color: theme.textColor }]}>
+          <Text style={themedStyles.footerText}>
             El participante con más puntos al finalizar el torneo gana la
             quiniela. Lógicamente.
           </Text>
@@ -47,6 +50,17 @@ export const RulesModal: React.FC = (): React.ReactElement => {
     </View>
   );
 };
+
+const themedStylesFactory = (theme: TournamentTheme) =>
+  StyleSheet.create({
+    footerText: {
+      fontSize: 13,
+      opacity: 0.55,
+      flex: 1,
+      lineHeight: 18,
+      color: theme.textColor,
+    },
+  });
 
 const styles = StyleSheet.create({
   container: {
@@ -91,11 +105,5 @@ const styles = StyleSheet.create({
   footerIcon: {
     marginRight: 10,
     opacity: 0.6,
-  },
-  footerText: {
-    fontSize: 13,
-    opacity: 0.55,
-    flex: 1,
-    lineHeight: 18,
   },
 });

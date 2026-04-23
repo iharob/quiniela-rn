@@ -84,7 +84,7 @@ export const HamburgerMenu = (): React.ReactNode => {
         onRequestClose={close}
       >
         <Pressable style={styles.backdrop} onPress={close}>
-          <View style={[styles.menu, { top: statusBarHeight + 12 }]}>
+          <View style={styles.menu}>
             <TouchableOpacity
               style={styles.menuItem}
               onPress={handleShowSettings}

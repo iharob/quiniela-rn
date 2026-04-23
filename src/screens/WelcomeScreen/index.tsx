@@ -2,7 +2,8 @@ import { GoogleGLogo } from '@app/components/googleGLogo';
 import { Spinner } from '@app/components/spinner';
 import { logoHeight, logoWidth } from '@app/constants';
 import { useGoogleAuthMutation } from '@app/hooks/mutations';
-import { useTheme } from '@app/theme/ThemeContext';
+import { useThemedStyles } from '@app/theme/useThemedStyles';
+import { TournamentTheme } from '@app/types/tournamentConfig';
 import {
   GoogleSignin,
   statusCodes,
@@ -19,7 +20,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
   props: WelcomeScreenProps,
 ): React.ReactElement => {
   const { onNavigateToRegister, onNavigateToLogin } = props;
-  const theme = useTheme();
+  const themedStyles = useThemedStyles(themedStylesFactory);
 
   const [error, setError] = React.useState<string | null>(null);
 
@@ -127,25 +128,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = (
           <Text style={styles.googleButtonText}>Iniciar sesión con Google</Text>
         </TouchableOpacity>
         <View style={styles.dividerRow}>
-          <View
-            style={[styles.dividerLine, { backgroundColor: theme.borderColor }]}
-          />
-          <Text style={[styles.dividerText, { color: theme.textColor }]}>
-            o
-          </Text>
-          <View
-            style={[styles.dividerLine, { backgroundColor: theme.borderColor }]}
-          />
+          <View style={themedStyles.dividerLine} />
+          <Text style={themedStyles.dividerText}>o</Text>
+          <View style={themedStyles.dividerLine} />
         </View>
         <TouchableOpacity onPress={onNavigateToRegister} activeOpacity={0.7}>
-          <Text style={[styles.linkText, { color: theme.primaryColor }]}>
-            Registrarse con email
-          </Text>
+          <Text style={themedStyles.linkText}>Registrarse con email</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={onNavigateToLogin} activeOpacity={0.7}>
-          <Text style={[styles.linkText, { color: theme.primaryColor }]}>
-            Ya tengo cuenta
-          </Text>
+          <Text style={themedStyles.linkText}>Ya tengo cuenta</Text>
         </TouchableOpacity>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <Spinner visible={googleAuthMutation.isPending} />
@@ -208,23 +199,30 @@ const styles = StyleSheet.create({
     width: '100%',
     marginVertical: 16,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    marginHorizontal: 12,
-    fontSize: 13,
-    opacity: 0.5,
-  },
-  linkText: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginVertical: 6,
-  },
   errorText: {
     color: '#c00',
     marginTop: 12,
     textAlign: 'center',
   },
 });
+
+const themedStylesFactory = (theme: TournamentTheme) =>
+  StyleSheet.create({
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: theme.borderColor,
+    },
+    dividerText: {
+      marginHorizontal: 12,
+      fontSize: 13,
+      opacity: 0.5,
+      color: theme.textColor,
+    },
+    linkText: {
+      fontSize: 14,
+      fontWeight: '500',
+      marginVertical: 6,
+      color: theme.primaryColor,
+    },
+  });
