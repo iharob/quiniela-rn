@@ -53,8 +53,10 @@ export const ScoreDetails: React.FC<Props> = (
   } = useUserScoreDetails(userId);
 
   React.useEffect((): (() => void) => {
-    return navigation.addListener('beforeRemove', (): void => {
-      queryClient.cancelQueries({ queryKey: ['userScoreDetails', userId] });
+    return navigation.addListener('beforeRemove', async (): Promise<void> => {
+      await queryClient.cancelQueries({
+        queryKey: ['userScoreDetails', userId],
+      });
     });
   }, [navigation, queryClient, userId]);
 
@@ -62,7 +64,8 @@ export const ScoreDetails: React.FC<Props> = (
     navigation.setOptions({
       headerTitle: HeaderTitle,
       headerTintColor: '#fff',
-      headerRight: DownloadPdfButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerRight: (): React.ReactNode => <DownloadPdfButton userId={userId} />,
       headerShown: true,
     });
 
