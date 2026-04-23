@@ -5,12 +5,9 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useRoute } from '@react-navigation/core';
 import { RouteProp } from '@react-navigation/native';
-import { HeaderTitleProps } from '@react-navigation/elements';
 import { StackParamsList } from '@app/screens/ParticipantsScreen';
 
-export const HeaderTitle: React.FC<HeaderTitleProps> = (
-  _props: HeaderTitleProps,
-): React.ReactElement => {
+export const HeaderTitle: React.FC = (): React.ReactElement => {
   const themedStyles = useThemedStyles(themedStylesFactory);
   const route = useRoute<RouteProp<StackParamsList, 'UserScoreDetails'>>();
 

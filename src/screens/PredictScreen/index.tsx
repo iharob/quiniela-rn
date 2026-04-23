@@ -61,7 +61,7 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
     (): NativeStackNavigationOptions => ({
       title: '',
       headerShown: true,
-      headerRight: HamburgerMenu,
+      headerRight: (): React.ReactElement => <HamburgerMenu />,
       headerTintColor: theme.contrastTextColor,
     }),
     [theme.contrastTextColor],

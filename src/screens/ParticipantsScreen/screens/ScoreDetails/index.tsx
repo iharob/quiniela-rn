@@ -62,10 +62,9 @@ export const ScoreDetails: React.FC<Props> = (
 
   React.useEffect((): void | (() => void) => {
     navigation.setOptions({
-      headerTitle: HeaderTitle,
-      headerTintColor: '#fff',
-      // eslint-disable-next-line react/no-unstable-nested-components
+      headerTitle: (): React.ReactNode => <HeaderTitle />,
       headerRight: (): React.ReactNode => <DownloadPdfButton userId={userId} />,
+      headerTintColor: '#fff',
       headerShown: true,
     });
 
