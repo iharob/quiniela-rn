@@ -5,7 +5,7 @@ import { SIMULATE } from '@app/config';
 import { useApi } from '@app/context/api';
 import { flags } from '@app/flags';
 import { useGroupsScreenStore } from '@app/mobx/groupsScreenStore';
-import { useKnockoutPhaseStore } from '@app/mobx/konckoutStore';
+import { useKnockoutPhaseStore } from '@app/mobx/knockoutStore.ts';
 import { useSessionStore } from '@app/mobx/sessionStore';
 import { PredictionStackParamsList } from '@app/screens/PredictScreen';
 import { GameWithResult } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
@@ -28,7 +28,9 @@ interface Props {
 export const Final: React.FC<Props> = (props: Props): React.ReactElement => {
   const { route } = props;
 
-  const [currentGame, setCurrentGame] = React.useState<GameWithResult>(route.params);
+  const [currentGame, setCurrentGame] = React.useState<GameWithResult>(
+    route.params,
+  );
   const [processing, setProcessing] = React.useState<boolean>(false);
   const theme = useTheme();
 
@@ -38,7 +40,10 @@ export const Final: React.FC<Props> = (props: Props): React.ReactElement => {
   const navigation = useNavigation<NavigationProp<PredictionStackParamsList>>();
   const sessionStore = useSessionStore();
 
-  const winner = React.useMemo((): Team => getWinner(currentGame), [currentGame]);
+  const winner = React.useMemo(
+    (): Team => getWinner(currentGame),
+    [currentGame],
+  );
 
   React.useEffect(() => {
     if (SIMULATE) {
@@ -67,24 +72,33 @@ export const Final: React.FC<Props> = (props: Props): React.ReactElement => {
       .finally((): void => {
         setProcessing(false);
       });
-  }, [api, currentGame, groupsStore.groups, knockoutStore.rounds, sessionStore]);
+  }, [
+    api,
+    currentGame,
+    groupsStore.groups,
+    knockoutStore.rounds,
+    sessionStore,
+  ]);
 
-  const handleChange = React.useCallback((team: Team, value: number | null): void => {
-    setCurrentGame(
-      (previousValue: GameWithResult): GameWithResult =>
-        team.country === previousValue.team1.country
-          ? {
-              ...previousValue,
-              team1Score: value,
-              winner: null,
-            }
-          : {
-              ...previousValue,
-              team2Score: value,
-              winner: null,
-            },
-    );
-  }, []);
+  const handleChange = React.useCallback(
+    (team: Team, value: number | null): void => {
+      setCurrentGame(
+        (previousValue: GameWithResult): GameWithResult =>
+          team.country === previousValue.team1.country
+            ? {
+                ...previousValue,
+                team1Score: value,
+                winner: null,
+              }
+            : {
+                ...previousValue,
+                team2Score: value,
+                winner: null,
+              },
+      );
+    },
+    [],
+  );
 
   const handleWinnerSelected = React.useCallback((team: Team): void => {
     setCurrentGame(
@@ -106,8 +120,10 @@ export const Final: React.FC<Props> = (props: Props): React.ReactElement => {
   }, [navigation, theme.contrastTextColor, theme.textColor]);
 
   const WinnerFlag = React.useMemo(
-    (): React.FunctionComponent<{ readonly width: number; readonly height: number }> =>
-      flags[winner.country],
+    (): React.FunctionComponent<{
+      readonly width: number;
+      readonly height: number;
+    }> => flags[winner.country],
     [winner.country],
   );
 

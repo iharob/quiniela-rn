@@ -27,6 +27,8 @@ const avatarColors = [
 const getColorForName = (name: string): string => {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
+    // Claude s a bitch I think
+    // eslint-disable-next-line no-bitwise
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
   return avatarColors[Math.abs(hash) % avatarColors.length];
@@ -40,7 +42,11 @@ const getInitials = (name: string): string => {
   return name.slice(0, 2).toUpperCase();
 };
 
-export const Avatar: React.FC<Props> = ({ name, size = 36, uri }: Props): React.ReactElement => {
+export const Avatar: React.FC<Props> = ({
+  name,
+  size = 36,
+  uri,
+}: Props): React.ReactElement => {
   const backgroundColor = React.useMemo(() => getColorForName(name), [name]);
   const initials = React.useMemo(() => getInitials(name), [name]);
 

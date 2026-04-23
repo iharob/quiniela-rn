@@ -21,7 +21,6 @@ import {
   RouteProp,
   useNavigation,
 } from '@react-navigation/native';
-import { HeaderTitleProps } from '@react-navigation/elements';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import {
@@ -47,7 +46,11 @@ export const ScoreDetails: React.FC<Props> = (
   const { route } = props;
   const { userId } = route.params;
 
-  const { data: pointsDetails = PointsDetails.empty(), isFetching, refetch } = useUserScoreDetails(userId);
+  const {
+    data: pointsDetails = PointsDetails.empty(),
+    isFetching,
+    refetch,
+  } = useUserScoreDetails(userId);
 
   React.useEffect((): (() => void) => {
     return navigation.addListener('beforeRemove', (): void => {
@@ -57,11 +60,9 @@ export const ScoreDetails: React.FC<Props> = (
 
   React.useEffect((): void | (() => void) => {
     navigation.setOptions({
-      headerTitle: (props: HeaderTitleProps): React.ReactNode => (
-        <HeaderTitle {...props} />
-      ),
+      headerTitle: HeaderTitle,
       headerTintColor: '#fff',
-      headerRight: (): React.ReactNode => <DownloadPdfButton userId={userId} />,
+      headerRight: DownloadPdfButton,
       headerShown: true,
     });
 

@@ -1,6 +1,10 @@
 import { API_URL, SIMULATE } from '@app/config';
-import { Rounds } from '@app/mobx/konckoutStore';
-import { PublicUserProfile, UserProfile, UserSession } from '@app/mobx/sessionStore';
+import { Rounds } from '@app/mobx/knockoutStore.ts';
+import {
+  PublicUserProfile,
+  UserProfile,
+  UserSession,
+} from '@app/mobx/sessionStore';
 import {
   GameWithResult,
   GroupWithResults,
@@ -10,7 +14,6 @@ import { deleteUserSession, saveUserSession } from '@app/sessionUtils';
 import { BracketRound, Game } from '@app/types/game';
 import { Group } from '@app/types/group';
 import { RankingsEntry } from '@app/types/rankingsEntry';
-import { TournamentConfig } from '@app/types/tournamentConfig';
 import { simulateGroupScore } from '@app/utils/simulate';
 import axios, { AxiosResponse } from 'axios';
 import React from 'react';
@@ -18,7 +21,9 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 
 interface PredictionPayload {
   readonly groups: readonly GroupWithResults[];
-  readonly playoffs: ReadonlyArray<ReadonlyArray<[GameWithResult, GameWithResult]>>;
+  readonly playoffs: ReadonlyArray<
+    ReadonlyArray<[GameWithResult, GameWithResult]>
+  >;
   readonly final: GameWithResult;
 }
 
@@ -29,27 +34,14 @@ interface ComputeBracketsPayload {
 export class Api {
   public static BEARER_TOKEN_KEY = 'bearerToken';
   private bearerToken = '';
-  private baseUrl = API_URL;
 
   public setBearerToken = (bearerToken: string): void => {
     this.bearerToken = bearerToken;
   };
 
-  public setBaseUrl = (url: string): void => {
-    this.baseUrl = url;
-  };
-
   private get url(): string {
-    return this.baseUrl;
+    return API_URL;
   }
-
-  public fetchTournamentConfig = async (): Promise<TournamentConfig> => {
-    const response = await axios.get(`${this.url}/tournament/config`);
-    if (response.status !== 200) {
-      throw new Error('No se pudo obtener la configuración del torneo');
-    }
-    return response.data;
-  };
 
   public computeBrackets = async (
     predictions: ComputeBracketsPayload,
@@ -68,7 +60,9 @@ export class Api {
   };
 
   public googleAuth = async (credential: string): Promise<UserSession> => {
-    const response = await axios.post(this.url + '/auth/google', { credential });
+    const response = await axios.post(this.url + '/auth/google', {
+      credential,
+    });
     if (response.status !== 200 && response.status !== 201) {
       throw new Error('Ocurrió un error, no pudimos identificarlo con Google');
     }
@@ -83,7 +77,11 @@ export class Api {
     name: string,
     password: string,
   ): Promise<UserSession> => {
-    const response = await axios.post(this.url + '/auth/register', { email, name, password });
+    const response = await axios.post(this.url + '/auth/register', {
+      email,
+      name,
+      password,
+    });
     if (response.status !== 200 && response.status !== 201) {
       throw new Error('No pudimos completar el registro');
     }
@@ -93,8 +91,14 @@ export class Api {
     return session;
   };
 
-  public emailLogin = async (email: string, password: string): Promise<UserSession> => {
-    const response = await axios.post(this.url + '/auth/login', { email, password });
+  public emailLogin = async (
+    email: string,
+    password: string,
+  ): Promise<UserSession> => {
+    const response = await axios.post(this.url + '/auth/login', {
+      email,
+      password,
+    });
     if (response.status !== 200 && response.status !== 201) {
       throw new Error('No pudimos iniciar sesión');
     }
@@ -186,9 +190,9 @@ export class Api {
 
     // Rounds are keyed by API round number (5 = R32, 4 = R16, ..., 1 = Final).
     // Emit them in R32-first order so the payload reads naturally from earliest to latest round.
-    const playoffs: ReadonlyArray<ReadonlyArray<[GameWithResult, GameWithResult]>> = Object.keys(
-      knockout,
-    )
+    const playoffs: ReadonlyArray<
+      ReadonlyArray<[GameWithResult, GameWithResult]>
+    > = Object.keys(knockout)
       .map((key: string): number => Number(key))
       .sort((a: number, b: number): number => b - a)
       .map(
@@ -207,11 +211,15 @@ export class Api {
       final: sanitizeKnockoutGame(final),
     };
 
-    const response: AxiosResponse = await axios.post(this.url + '/prediction', payload, {
-      headers: {
-        Authorization: 'Bearer ' + this.bearerToken,
+    const response: AxiosResponse = await axios.post(
+      this.url + '/prediction',
+      payload,
+      {
+        headers: {
+          Authorization: 'Bearer ' + this.bearerToken,
+        },
       },
-    });
+    );
 
     if (response.status !== 201) {
       throw new Error('No pudimos crear su quiniela, vuelva a intentar luego');
@@ -231,7 +239,9 @@ export class Api {
     return response.data;
   };
 
-  public fetchRankings = async (signal: AbortSignal): Promise<readonly RankingsEntry[]> => {
+  public fetchRankings = async (
+    signal: AbortSignal,
+  ): Promise<readonly RankingsEntry[]> => {
     const response = await axios.get(this.url + '/rankings', {
       headers: {
         Authorization: 'Bearer ' + this.bearerToken,
@@ -257,7 +267,9 @@ export class Api {
     return response.data;
   };
 
-  public getUserProfile = async (userId: number): Promise<PublicUserProfile> => {
+  public getUserProfile = async (
+    userId: number,
+  ): Promise<PublicUserProfile> => {
     const response = await axios.get(`${this.url}/profile/${userId}`, {
       headers: {
         Authorization: 'Bearer ' + this.bearerToken,

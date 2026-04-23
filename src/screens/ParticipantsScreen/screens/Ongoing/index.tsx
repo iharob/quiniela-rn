@@ -6,7 +6,11 @@ import { useSessionStore } from '@app/mobx/sessionStore';
 import { ListEmptyMessage } from '@app/screens/ParticipantsScreen/screens/components/listEmptyMessage';
 import { useThemedStyles } from '@app/theme/useThemedStyles';
 import { TournamentTheme } from '@app/types/tournamentConfig';
-import { GameResultGroup, SelfResult, UserResult } from '@app/types/userResults';
+import {
+  GameResultGroup,
+  SelfResult,
+  UserResult,
+} from '@app/types/userResults';
 import React from 'react';
 import {
   ListRenderItemInfo,
@@ -28,18 +32,30 @@ export const Ongoing: React.FC = (): React.ReactElement => {
   }, [refetch]);
 
   const sections = React.useMemo(
-    (): ReadonlyArray<SectionListData<UserResult, Omit<GameResultGroup & SelfResult, 'results'>>> =>
+    (): ReadonlyArray<
+      SectionListData<
+        UserResult,
+        Omit<GameResultGroup & SelfResult, 'groupResults'>
+      >
+    > =>
       results.map(
         (
           group: GameResultGroup,
-        ): SectionListData<UserResult, Omit<GameResultGroup & SelfResult, 'results'>> => {
-          const { results } = group;
+        ): SectionListData<
+          UserResult,
+          Omit<GameResultGroup & SelfResult, 'groupResults'>
+        > => {
+          const { results: groupResults } = group;
 
           return {
-            self: results.find(({ user }: UserResult): boolean => user.id === currentUserId),
+            self: groupResults.find(
+              ({ user }: UserResult): boolean => user.id === currentUserId,
+            ),
             team1: group.team1,
             team2: group.team2,
-            data: results.filter(({ user }: UserResult): boolean => user.id !== currentUserId),
+            data: groupResults.filter(
+              ({ user }: UserResult): boolean => user.id !== currentUserId,
+            ),
           };
         },
       ),
@@ -50,7 +66,10 @@ export const Ongoing: React.FC = (): React.ReactElement => {
     ({
       section,
     }: {
-      section: SectionListData<UserResult, Omit<GameResultGroup & SelfResult, 'results'>>;
+      section: SectionListData<
+        UserResult,
+        Omit<GameResultGroup & SelfResult, 'groupResults'>
+      >;
     }): React.ReactElement => {
       const { team1, team2, self } = section;
       if (self) {
@@ -60,22 +79,46 @@ export const Ongoing: React.FC = (): React.ReactElement => {
           <View style={themedStyles.headerRow}>
             <View style={themedStyles.row}>
               <TeamItem team={team1} orientation="vertical" variant="light" />
-              <Text style={[themedStyles.rowText, styles.userCell, themedStyles.header]}>
+              <Text
+                style={[
+                  themedStyles.rowText,
+                  styles.userCell,
+                  themedStyles.header,
+                ]}
+              >
                 Usuario
               </Text>
               <TeamItem team={team2} orientation="vertical" variant="light" />
             </View>
             <View style={themedStyles.row}>
-              <Text style={[themedStyles.rowText, styles.teamCell, themedStyles.self]}>
+              <Text
+                style={[
+                  themedStyles.rowText,
+                  styles.teamCell,
+                  themedStyles.self,
+                ]}
+              >
                 {self.team1Score}
               </Text>
               <View style={styles.userCell}>
                 <Avatar name={user.name} uri={user.photoUrl} size={28} />
-                <Text style={[themedStyles.rowText, styles.userName, themedStyles.self]}>
+                <Text
+                  style={[
+                    themedStyles.rowText,
+                    styles.userName,
+                    themedStyles.self,
+                  ]}
+                >
                   {user.name}
                 </Text>
               </View>
-              <Text style={[themedStyles.rowText, styles.teamCell, themedStyles.self]}>
+              <Text
+                style={[
+                  themedStyles.rowText,
+                  styles.teamCell,
+                  themedStyles.self,
+                ]}
+              >
                 {self.team2Score}
               </Text>
             </View>
@@ -86,7 +129,13 @@ export const Ongoing: React.FC = (): React.ReactElement => {
           <View style={themedStyles.headerRow}>
             <View style={themedStyles.row}>
               <TeamItem team={team1} orientation="vertical" variant="light" />
-              <Text style={[themedStyles.rowText, styles.userCell, themedStyles.header]}>
+              <Text
+                style={[
+                  themedStyles.rowText,
+                  styles.userCell,
+                  themedStyles.header,
+                ]}
+              >
                 Usuario
               </Text>
               <TeamItem team={team2} orientation="vertical" variant="light" />
@@ -105,12 +154,18 @@ export const Ongoing: React.FC = (): React.ReactElement => {
 
       return (
         <View style={themedStyles.row}>
-          <Text style={[themedStyles.rowText, styles.teamCell]}>{item.team1Score}</Text>
+          <Text style={[themedStyles.rowText, styles.teamCell]}>
+            {item.team1Score}
+          </Text>
           <View style={styles.userCell}>
             <Avatar name={user.name} uri={user.photoUrl} size={28} />
-            <Text style={[themedStyles.rowText, styles.userName]}>{user.name}</Text>
+            <Text style={[themedStyles.rowText, styles.userName]}>
+              {user.name}
+            </Text>
           </View>
-          <Text style={[themedStyles.rowText, styles.teamCell]}>{item.team2Score}</Text>
+          <Text style={[themedStyles.rowText, styles.teamCell]}>
+            {item.team2Score}
+          </Text>
         </View>
       );
     },
@@ -125,7 +180,9 @@ export const Ongoing: React.FC = (): React.ReactElement => {
       renderSectionHeader={renderSectionHeader}
       renderItem={renderItem}
       ItemSeparatorComponent={ListItemSeparator}
-      ListEmptyComponent={<ListEmptyMessage message="No hay partidos en este momento" />}
+      ListEmptyComponent={
+        <ListEmptyMessage message="No hay partidos en este momento" />
+      }
       refreshing={isFetching}
       onRefresh={handleRefresh}
     />

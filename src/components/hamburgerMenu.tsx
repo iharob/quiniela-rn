@@ -13,7 +13,6 @@ import {
   Alert,
   Modal,
   Pressable,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -58,8 +57,6 @@ export const HamburgerMenu = (): React.ReactNode => {
       },
     ]);
   }, [sessionStore, close]);
-
-  const statusBarHeight = StatusBar.currentHeight ?? 0;
 
   return (
     <View style={styles.container}>

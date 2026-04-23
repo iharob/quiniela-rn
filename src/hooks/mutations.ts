@@ -4,7 +4,7 @@ import {
   useQueryClient,
   UseMutationResult,
 } from '@tanstack/react-query';
-import { Rounds } from '@app/mobx/konckoutStore';
+import { Rounds } from '@app/mobx/knockoutStore.ts';
 import {
   GameWithResult,
   GroupWithResults,

@@ -1,7 +1,6 @@
 import { Api } from '@app/context/api';
 import { GameWithResult } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
 import { BracketRound } from '@app/types/game';
-import { KnockoutRoundConfig } from '@app/types/tournamentConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { action, makeObservable, observable } from 'mobx';
 import React from 'react';
@@ -17,12 +16,7 @@ export class KnockoutStore {
   public rounds: Rounds = {};
   public bracketFixtures: readonly BracketRound[] = [];
 
-  constructor(
-    api: Api,
-    userId: number,
-    tournamentName = 'default',
-    knockoutRounds?: readonly KnockoutRoundConfig[],
-  ) {
+  constructor(api: Api, userId: number) {
     makeObservable<KnockoutStore, 'setRounds'>(this, {
       rounds: observable.ref,
       bracketFixtures: observable.ref,
@@ -32,15 +26,7 @@ export class KnockoutStore {
     });
 
     this.api = api;
-    this.saveKey = `@knockout_v2_${userId}_${tournamentName}`;
-
-    if (knockoutRounds) {
-      const initialRounds: Rounds = {};
-      for (const round of knockoutRounds) {
-        initialRounds[round.teamsCount] = [];
-      }
-      this.rounds = initialRounds;
-    }
+    this.saveKey = `@knockout_v2_${userId}_default`;
   }
 
   public setRounds(rounds: Rounds): void {

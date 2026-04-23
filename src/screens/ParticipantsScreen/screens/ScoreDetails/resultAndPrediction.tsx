@@ -1,7 +1,6 @@
 import { ListItemBase } from '@app/screens/ParticipantsScreen/screens/ScoreDetails/ListItemBase';
 import { TeamCell } from '@app/screens/ParticipantsScreen/screens/ScoreDetails/teamCell';
 import { PredictedResult } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
-import { useTheme } from '@app/theme/ThemeContext';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 

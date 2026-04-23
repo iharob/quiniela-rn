@@ -56,7 +56,8 @@ const updateClassification = (
   }
 
   const oldEntry: ClassificationEntry = table[team1.country];
-  const points = team1Score > team2Score ? 3 : team1Score === team2Score ? 1 : 0;
+  const points =
+    team1Score > team2Score ? 3 : team1Score === team2Score ? 1 : 0;
   const won = team1Score > team2Score ? oldEntry.won + 1 : oldEntry.won;
   const drawn = team1Score === team2Score ? oldEntry.drawn + 1 : oldEntry.drawn;
   const lost = team1Score < team2Score ? oldEntry.lost + 1 : oldEntry.lost;
@@ -91,18 +92,24 @@ export const computeClassificationTable = (
       (other: Team): boolean =>
         team.country === other.country;
 
-    const teams = games.reduce((teams: readonly Team[], game: GameWithResult): readonly Team[] => {
-      const { team1, team2 } = game;
-      if (teams.find(findTeam(team1)) && teams.find(findTeam(team2))) {
-        return teams;
-      } else if (teams.find(findTeam(team1))) {
-        return [...teams, team2];
-      } else if (teams.find(findTeam(team2))) {
-        return [...teams, team1];
-      } else {
-        return [...teams, team1, team2];
-      }
-    }, []);
+    const teams = games.reduce(
+      (accumulator: readonly Team[], game: GameWithResult): readonly Team[] => {
+        const { team1, team2 } = game;
+        if (
+          accumulator.find(findTeam(team1)) &&
+          accumulator.find(findTeam(team2))
+        ) {
+          return accumulator;
+        } else if (accumulator.find(findTeam(team1))) {
+          return [...accumulator, team2];
+        } else if (accumulator.find(findTeam(team2))) {
+          return [...accumulator, team1];
+        } else {
+          return [...accumulator, team1, team2];
+        }
+      },
+      [],
+    );
 
     const mapped = games.reduce(
       (
@@ -113,8 +120,20 @@ export const computeClassificationTable = (
 
         return {
           ...table,
-          [team1.country]: updateClassification(team1, team2, team1Score, team2Score, table),
-          [team2.country]: updateClassification(team2, team1, team2Score, team1Score, table),
+          [team1.country]: updateClassification(
+            team1,
+            team2,
+            team1Score,
+            team2Score,
+            table,
+          ),
+          [team2.country]: updateClassification(
+            team2,
+            team1,
+            team2Score,
+            team1Score,
+            table,
+          ),
         };
       },
       teams.reduce(
@@ -139,11 +158,14 @@ export const computeClassificationTable = (
 
           const e1Difference = e1.goalsScored - e1.goalsReceived;
           const e2Difference = e2.goalsScored - e2.goalsReceived;
-          const direct = e1.directMatches[team2.country] ?? { scored: 0, received: 0 };
+          const direct = e1.directMatches[team2.country] ?? {
+            scored: 0,
+            received: 0,
+          };
 
           if (e1Points !== e2Points) {
             return e2Points - e1Points;
-          } else if (e2Difference != e1Difference) {
+          } else if (e2Difference !== e1Difference) {
             return e2Difference - e1Difference;
           } else if (e2.goalsScored !== e1.goalsScored) {
             return e2.goalsScored - e1.goalsScored;

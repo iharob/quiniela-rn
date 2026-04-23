@@ -11,17 +11,18 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+import { useRoute } from '@react-navigation/core';
+import { RouteProp } from '@react-navigation/native';
+import { StackParamsList } from '@app/screens/ParticipantsScreen';
 
-interface Props {
-  readonly userId: number;
-}
+export const DownloadPdfButton: React.FC = (): React.ReactElement => {
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
-export const DownloadPdfButton: React.FC<Props> = ({
-  userId,
-}: Props): React.ReactElement => {
+  const route = useRoute<RouteProp<StackParamsList, 'UserScoreDetails'>>();
   const api = useApi();
   const theme = useTheme();
-  const [isDownloading, setIsDownloading] = React.useState(false);
+
+  const { userId } = route.params;
 
   const onPress = React.useCallback(async (): Promise<void> => {
     setIsDownloading(true);
@@ -51,7 +52,8 @@ export const DownloadPdfButton: React.FC<Props> = ({
       style={styles.button}
       hitSlop={hitSlop}
       accessibilityRole="button"
-      accessibilityLabel="Descargar PDF">
+      accessibilityLabel="Descargar PDF"
+    >
       {isDownloading ? (
         <ActivityIndicator color={theme.contrastTextColor} />
       ) : (

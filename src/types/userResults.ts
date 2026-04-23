@@ -15,7 +15,7 @@ export interface UserResult {
 export interface GameResultGroup {
   readonly team1: Team;
   readonly team2: Team;
-  readonly results: readonly UserResult[];
+  readonly groupResults: readonly UserResult[];
 }
 
 export interface SelfResult {

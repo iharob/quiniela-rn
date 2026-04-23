@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useTheme } from '@app/theme/ThemeContext';
 import React from 'react';
 import { StyleSheet, Text, TextStyle, View } from 'react-native';
@@ -8,7 +7,9 @@ interface Props {
   readonly difference: number;
 }
 
-export const ScoreCell: React.FC<Props> = (props: Props): React.ReactElement => {
+export const ScoreCell: React.FC<Props> = (
+  props: Props,
+): React.ReactElement => {
   const { score, difference } = props;
   const theme = useTheme();
 
@@ -38,7 +39,9 @@ export const ScoreCell: React.FC<Props> = (props: Props): React.ReactElement => 
   return (
     <View style={styles.container}>
       <Text style={[scoreTextStyle, valueStyle]}>{score}</Text>
-      <Text style={[styles.changeText, changeStyle]}>{differenceFormatter.format(difference)}</Text>
+      <Text style={[styles.changeText, changeStyle]}>
+        {differenceFormatter.format(difference)}
+      </Text>
     </View>
   );
 };

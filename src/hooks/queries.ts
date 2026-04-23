@@ -1,20 +1,11 @@
 import { useApi } from '@app/context/api';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { TournamentConfig } from '@app/types/tournamentConfig';
 import { RankingsEntry } from '@app/types/rankingsEntry';
 import { PublicUserProfile, UserProfile } from '@app/mobx/sessionStore';
 import {
   GroupWithResults,
   PointsDetails,
 } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
-
-export const useTournamentConfigQuery = (): UseQueryResult<TournamentConfig, Error> => {
-  const api = useApi();
-  return useQuery({
-    queryKey: ['tournamentConfig'],
-    queryFn: (): Promise<TournamentConfig> => api.fetchTournamentConfig(),
-  });
-};
 
 export const useRankings = (): UseQueryResult<readonly RankingsEntry[], Error> => {
   const api = useApi();

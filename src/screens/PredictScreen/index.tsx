@@ -5,7 +5,10 @@ import {
   GroupsScreenStore,
   GroupsScreenStoreContext,
 } from '@app/mobx/groupsScreenStore';
-import { KnockoutStore, KnockoutStoreContext } from '@app/mobx/konckoutStore';
+import {
+  KnockoutStore,
+  KnockoutStoreContext,
+} from '@app/mobx/knockoutStore.ts';
 import { useSessionStore } from '@app/mobx/sessionStore';
 import { Final } from '@app/screens/PredictScreen/screens/FinalScreen';
 import { Groups } from '@app/screens/PredictScreen/screens/GroupsScreen';
@@ -58,7 +61,7 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
     (): NativeStackNavigationOptions => ({
       title: '',
       headerShown: true,
-      headerRight: (): React.ReactNode => <HamburgerMenu />,
+      headerRight: HamburgerMenu,
       headerTintColor: theme.contrastTextColor,
     }),
     [theme.contrastTextColor],
@@ -88,4 +91,5 @@ export const PredictScreen: React.FC = (): React.ReactElement => {
   );
 };
 
-const RegistrationRoutes = createNativeStackNavigator<PredictionStackParamsList>();
+const RegistrationRoutes =
+  createNativeStackNavigator<PredictionStackParamsList>();

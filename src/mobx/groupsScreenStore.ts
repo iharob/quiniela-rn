@@ -3,7 +3,10 @@ import {
   GameWithResult,
   GroupWithResults,
 } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
-import { ClassificationGroup, computeClassificationTable } from '@app/types/classifications';
+import {
+  ClassificationGroup,
+  computeClassificationTable,
+} from '@app/types/classifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { action, computed, makeObservable, observable } from 'mobx';
 import React from 'react';
@@ -59,24 +62,26 @@ export class GroupsScreenStore {
     teamKey: 'team1' | 'team2',
     value: number | null,
   ): void {
-    this.groups = this.groups.map((group: GroupWithResults): GroupWithResults => {
-      if (group.name !== groupName) {
-        return group;
-      }
+    this.groups = this.groups.map(
+      (group: GroupWithResults): GroupWithResults => {
+        if (group.name !== groupName) {
+          return group;
+        }
 
-      return {
-        name: group.name,
-        games: group.games.map((game: GameWithResult): GameWithResult => {
-          if (game.gameId !== gameId) {
-            return game;
-          } else if (teamKey === 'team1') {
-            return { ...game, team1Score: value };
-          } else {
-            return { ...game, team2Score: value };
-          }
-        }),
-      };
-    });
+        return {
+          name: group.name,
+          games: group.games.map((game: GameWithResult): GameWithResult => {
+            if (game.gameId !== gameId) {
+              return game;
+            } else if (teamKey === 'team1') {
+              return { ...game, team1Score: value };
+            } else {
+              return { ...game, team2Score: value };
+            }
+          }),
+        };
+      },
+    );
 
     this.saveGroup(groupName).catch((error: Error): void => {
       console.warn(error);
@@ -84,7 +89,9 @@ export class GroupsScreenStore {
   }
 
   private async saveGroup(groupName: string): Promise<void> {
-    const group = this.groups.find((g: GroupWithResults): boolean => g.name === groupName);
+    const group = this.groups.find(
+      (g: GroupWithResults): boolean => g.name === groupName,
+    );
     if (!group) {
       return;
     }
@@ -100,7 +107,10 @@ export class GroupsScreenStore {
     }
 
     const persistedByName = new Map<string, GroupWithResults>(
-      persisted.map((group: GroupWithResults): [string, GroupWithResults] => [group.name, group]),
+      persisted.map((group: GroupWithResults): [string, GroupWithResults] => [
+        group.name,
+        group,
+      ]),
     );
 
     return fresh.map((group: GroupWithResults): GroupWithResults => {
@@ -115,7 +125,10 @@ export class GroupsScreenStore {
       }
 
       const savedByGameId = new Map<number, GameWithResult>(
-        saved.games.map((game: GameWithResult): [number, GameWithResult] => [game.gameId, game]),
+        saved.games.map((game: GameWithResult): [number, GameWithResult] => [
+          game.gameId,
+          game,
+        ]),
       );
 
       const merged: GameWithResult[] = [];
@@ -160,12 +173,17 @@ export class GroupsScreenStore {
       });
   }
 
-  private async removeStalePersistedGroups(fresh: readonly GroupWithResults[]): Promise<void> {
-    const freshNames = new Set(fresh.map((group: GroupWithResults): string => group.name));
+  private async removeStalePersistedGroups(
+    fresh: readonly GroupWithResults[],
+  ): Promise<void> {
+    const freshNames = new Set(
+      fresh.map((group: GroupWithResults): string => group.name),
+    );
     const allKeys = await AsyncStorage.getAllKeys();
     const staleKeys = allKeys.filter(
       (key: string): boolean =>
-        key.startsWith(this.saveKeyPrefix) && !freshNames.has(key.slice(this.saveKeyPrefix.length)),
+        key.startsWith(this.saveKeyPrefix) &&
+        !freshNames.has(key.slice(this.saveKeyPrefix.length)),
     );
     if (staleKeys.length > 0) {
       await AsyncStorage.multiRemove(staleKeys);
@@ -175,15 +193,21 @@ export class GroupsScreenStore {
   public get completed(): number {
     const { groups } = this;
 
-    return groups.reduce((completed: number, group: GroupWithResults): number => {
-      const { games } = group;
+    return groups.reduce(
+      (completed: number, group: GroupWithResults): number => {
+        const { games } = group;
 
-      return (
-        games.reduce((completed: number, game: GameWithResult): number => {
-          return completed + (game.team1Score !== null && game.team2Score !== null ? 1 : 0);
-        }, 0) + completed
-      );
-    }, 0);
+        return (
+          games.reduce((accumulator: number, game: GameWithResult): number => {
+            return (
+              accumulator +
+              (game.team1Score !== null && game.team2Score !== null ? 1 : 0)
+            );
+          }, 0) + completed
+        );
+      },
+      0,
+    );
   }
 
   public get positions(): readonly ClassificationGroup[] {
@@ -199,7 +223,9 @@ export class GroupsScreenStore {
     await this.migrateLegacyStore();
 
     const allKeys = await AsyncStorage.getAllKeys();
-    const groupKeys = allKeys.filter((key: string): boolean => key.startsWith(this.saveKeyPrefix));
+    const groupKeys = allKeys.filter((key: string): boolean =>
+      key.startsWith(this.saveKeyPrefix),
+    );
 
     if (groupKeys.length === 0) {
       return [];
@@ -219,7 +245,9 @@ export class GroupsScreenStore {
       }
     }
 
-    groups.sort((a: GroupWithResults, b: GroupWithResults): number => a.name.localeCompare(b.name));
+    groups.sort((a: GroupWithResults, b: GroupWithResults): number =>
+      a.name.localeCompare(b.name),
+    );
     return groups;
   }
 
@@ -248,7 +276,8 @@ export class GroupsScreenStore {
     // Migrate per-group keys without userId (e.g. @groupsStore_GroupA -> @groupsStore_42_GroupA)
     const oldPrefix = GroupsScreenStore.SAVE_KEY_PREFIX;
     const oldKeys = allKeys.filter(
-      (key: string): boolean => key.startsWith(oldPrefix) && !key.startsWith(this.saveKeyPrefix),
+      (key: string): boolean =>
+        key.startsWith(oldPrefix) && !key.startsWith(this.saveKeyPrefix),
     );
     if (oldKeys.length > 0) {
       const entries = await AsyncStorage.multiGet(oldKeys);
@@ -274,7 +303,9 @@ export class GroupsScreenStore {
 }
 
 export const useGroupsScreenStore = (): GroupsScreenStore => {
-  const context = React.useContext<GroupsScreenStore | null>(GroupsScreenStoreContext);
+  const context = React.useContext<GroupsScreenStore | null>(
+    GroupsScreenStoreContext,
+  );
   if (context === null) {
     throw new Error('no groups screen store was defined in current context');
   }
@@ -282,4 +313,5 @@ export const useGroupsScreenStore = (): GroupsScreenStore => {
   return context;
 };
 
-export const GroupsScreenStoreContext = React.createContext<GroupsScreenStore | null>(null);
+export const GroupsScreenStoreContext =
+  React.createContext<GroupsScreenStore | null>(null);

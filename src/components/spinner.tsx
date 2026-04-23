@@ -1,12 +1,6 @@
 import { useTheme } from '@app/theme/ThemeContext';
 import React from 'react';
-import {
-  ActivityIndicator,
-  Modal,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
 
 interface Props {
   readonly visible: boolean;

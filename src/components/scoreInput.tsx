@@ -10,19 +10,21 @@ interface Props {
   onChange(team: Team, value: number | null): void;
 }
 
-export const ScoreInput: React.FC<Props> = (props: Props): React.ReactElement => {
+export const ScoreInput: React.FC<Props> = (
+  props: Props,
+): React.ReactElement => {
   const [hasFocus, setHasFocus] = React.useState<boolean>(false);
   const { value, team, onChange } = props;
   const theme = useTheme();
 
   const handleTextChange = React.useCallback(
-    (value: string): void => {
-      if (value.trim() === '') {
+    (previousValue: string): void => {
+      if (previousValue.trim() === '') {
         onChange(team, null);
         return;
       }
 
-      const numeric = Number(value);
+      const numeric = Number(previousValue);
       if (!isNaN(numeric)) {
         onChange(team, numeric);
       }
@@ -30,7 +32,10 @@ export const ScoreInput: React.FC<Props> = (props: Props): React.ReactElement =>
     [onChange, team],
   );
 
-  const stringValue = React.useMemo((): string => value?.toString() ?? '', [value]);
+  const stringValue = React.useMemo(
+    (): string => value?.toString() ?? '',
+    [value],
+  );
 
   const handleFocus = React.useCallback((): void => setHasFocus(true), []);
   const handleBlur = React.useCallback((): void => setHasFocus(false), []);

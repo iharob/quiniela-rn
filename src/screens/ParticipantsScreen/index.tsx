@@ -29,7 +29,7 @@ export const ParticipantsScreen: React.FC = (): React.ReactElement => {
     (): NativeStackNavigationOptions => ({
       title: 'Quiniela Mundial 2026',
       headerShown: true,
-      headerRight: (): React.ReactNode => <HamburgerMenu />,
+      headerRight: HamburgerMenu,
       headerTintColor: 'white',
     }),
     [],

@@ -4,7 +4,7 @@ import { Spinner } from '@app/components/spinner';
 import { useApi } from '@app/context/api';
 import { useLogout } from '@app/hooks/useLogout';
 import { useGroupsScreenStore } from '@app/mobx/groupsScreenStore';
-import { useKnockoutPhaseStore } from '@app/mobx/konckoutStore';
+import { useKnockoutPhaseStore } from '@app/mobx/knockoutStore.ts';
 import { PredictionStackParamsList } from '@app/screens/PredictScreen';
 import { GroupWithResults } from '@app/screens/PredictScreen/screens/GroupsScreen/common';
 import { GroupAccordionRow } from '@app/screens/PredictScreen/screens/GroupsScreen/groupAccordionRow';
