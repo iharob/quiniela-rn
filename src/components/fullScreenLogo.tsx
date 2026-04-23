@@ -5,7 +5,7 @@ import { Image, StyleSheet, View } from 'react-native';
 export const FullScreenLogo: React.FC = (): React.ReactElement => {
   return (
     <View style={styles.container}>
-      <Image style={styles.logo} source={require('@app/images/logo.png')} resizeMode="contain" />
+      <Image style={styles.logo} source={require('@app/images/logo-white.png')} resizeMode="contain" />
     </View>
   );
 };
