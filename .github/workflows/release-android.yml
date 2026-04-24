@@ -59,14 +59,14 @@ jobs:
           echo "version_name=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
           echo "version_code=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
-      - name: Build signed AAB
+      - name: Build signed AAB + APK
         working-directory: android
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          ./gradlew :app:bundleRelease \
+          ./gradlew :app:bundleRelease :app:assembleRelease \
             -PRELEASE_STORE_FILE=upload.keystore \
             -PRELEASE_STORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             -PRELEASE_KEY_ALIAS="$ANDROID_KEY_ALIAS" \
@@ -74,13 +74,34 @@ jobs:
             -PVERSION_CODE=${{ steps.version.outputs.version_code }} \
             -PVERSION_NAME=${{ steps.version.outputs.version_name }}
 
+      - name: Stage release artifacts
+        id: stage
+        run: |
+          STAGE="$RUNNER_TEMP/release"
+          mkdir -p "$STAGE"
+          VNAME="${{ steps.version.outputs.version_name }}"
+          VCODE="${{ steps.version.outputs.version_code }}"
+          cp android/app/build/outputs/bundle/release/app-release.aab "$STAGE/quiniela-${VNAME}-${VCODE}.aab"
+          cp android/app/build/outputs/apk/release/app-release.apk "$STAGE/quiniela-${VNAME}-${VCODE}.apk"
+          echo "dir=$STAGE" >> "$GITHUB_OUTPUT"
+          ls -la "$STAGE"
+
       - uses: actions/upload-artifact@v4
         with:
           name: app-release-${{ steps.version.outputs.version_name }}-${{ steps.version.outputs.version_code }}
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: ${{ steps.stage.outputs.dir }}/*
           if-no-files-found: error
 
+      - name: Publish GitHub Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.stage.outputs.dir }}/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+
       - name: Upload to Play Store
+        continue-on-error: true
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
