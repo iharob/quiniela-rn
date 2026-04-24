@@ -36,6 +36,7 @@ local.properties
 .kotlin/
 android/keystore.properties
 *.serviceaccount.json
+android/app/google-services.json
 
 # node.js
 #
