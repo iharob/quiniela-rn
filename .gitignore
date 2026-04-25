@@ -36,6 +36,9 @@ local.properties
 .kotlin/
 android/keystore.properties
 *.serviceaccount.json
+
+# Override globally-ignored patterns that are part of this repo's source
+!src/theme/
 android/app/google-services.json
 
 # node.js
