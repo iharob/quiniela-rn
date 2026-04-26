@@ -79,3 +79,43 @@ For state-dependent toggles (e.g. `disabled`, `isPending`), define a dedicated s
 - If not, it goes in the module-level `styles` `StyleSheet.create` block.
 - Never create a style object inside the component body (no `useMemo`, no `{}` literals, no spreads into a new object).
 - Never mutate `theme.*` into a prop object at render time — bind the token inside the factory instead.
+
+## Commit messages: ALWAYS use Conventional Commits
+
+Every commit on this repository **MUST** use the [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+<type>(<optional scope>)<!>: <subject>
+
+<optional body>
+
+<optional footers, e.g. BREAKING CHANGE: ...>
+```
+
+This rule applies to every commit, including any made with a `Co-Authored-By: Claude` trailer. There are no exemptions.
+
+### Allowed types
+
+`feat`, `fix`, `chore`, `refactor`, `docs`, `test`, `ci`, `build`, `perf`, `style`, `revert`. Pick the type that best matches the change; do not invent new ones.
+
+### Version-bump semantics
+
+The `release-please` workflow (`.github/workflows/release-please.yml`) derives the next semantic version and the `CHANGELOG.md` entries directly from these commit messages:
+
+- `feat:` → minor bump
+- `fix:` → patch bump
+- `feat!:` / `fix!:` / any commit with a `BREAKING CHANGE:` footer → major bump
+- All other types do not bump the version but still appear in the changelog when grouped.
+
+A non-conformant commit message is silently ignored by release-please and therefore vanishes from the changelog and the version computation. Treat that as a correctness bug, not a stylistic preference.
+
+### Examples
+
+```
+feat(participants): add filter for ongoing tournaments
+fix(api): retry on 502 instead of failing the request
+refactor(theme): collapse useThemedStyles helpers into one module
+feat!: drop legacy `tournamentId` prop from `<Header>`
+
+BREAKING CHANGE: callers must pass `tournament` instead of `tournamentId`.
+```
