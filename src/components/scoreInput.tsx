@@ -6,30 +6,31 @@ import { TextInput, TextStyle } from 'react-native';
 interface Props {
   readonly value: number | null;
   readonly team: Team;
+  readonly gameId: number;
 
-  onChange(team: Team, value: number | null): void;
+  onChange(gameId: number, team: Team, value: number | null): void;
 }
 
 export const ScoreInput: React.FC<Props> = (
   props: Props,
 ): React.ReactElement => {
   const [hasFocus, setHasFocus] = React.useState<boolean>(false);
-  const { value, team, onChange } = props;
+  const { value, team, gameId, onChange } = props;
   const theme = useTheme();
 
   const handleTextChange = React.useCallback(
     (previousValue: string): void => {
       if (previousValue.trim() === '') {
-        onChange(team, null);
+        onChange(gameId, team, null);
         return;
       }
 
       const numeric = Number(previousValue);
       if (!isNaN(numeric)) {
-        onChange(team, numeric);
+        onChange(gameId, team, numeric);
       }
     },
-    [onChange, team],
+    [onChange, team, gameId],
   );
 
   const stringValue = React.useMemo(

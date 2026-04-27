@@ -10,9 +10,9 @@ import { GroupWithResults } from '@app/screens/PredictScreen/screens/GroupsScree
 import { GroupAccordionRow } from '@app/screens/PredictScreen/screens/GroupsScreen/groupAccordionRow';
 import { useTheme } from '@app/theme/ThemeContext';
 import { ClassificationGroup } from '@app/types/classifications';
+import { Team } from '@app/types/game';
 import { findRound, pairMatchesByFeeders } from '@app/utils/brackets';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { noop } from 'mobx/src/utils/utils';
 import { observer } from 'mobx-react';
 import React from 'react';
 import {
@@ -79,6 +79,13 @@ export const Groups: React.FC = observer((): React.ReactElement => {
     );
   }, []);
 
+  const handleScoreChange = React.useCallback(
+    (gameId: number, team: Team, value: number | null): void => {
+      store.updateGameScore(gameId, team, value);
+    },
+    [store],
+  );
+
   const doHandleNext = React.useCallback(async (): Promise<void> => {
     setComputingDraw(true);
     try {
@@ -139,12 +146,12 @@ export const Groups: React.FC = observer((): React.ReactElement => {
           classificationGroup={positionsByName.get(item.name)}
           expanded={isExpanded}
           dimmed={dimmed}
-          onScoreChange={noop}
+          onScoreChange={handleScoreChange}
           onToggle={handleToggle}
         />
       );
     },
-    [expandedGroup, handleToggle, positionsByName],
+    [expandedGroup, handleScoreChange, handleToggle, positionsByName],
   );
 
   const keyExtractor = React.useCallback(

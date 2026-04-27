@@ -46,33 +46,17 @@ export const KnockoutRoundView: React.FC<Props> = observer(
     });
 
     const onScoreChange = React.useCallback(
-      (team: Team, value: number | null): void => {
+      (gameId: number, team: Team, value: number | null): void => {
         const updatedGroups = pairs.map(
           (
             currentGroup: [GameWithResult, GameWithResult],
           ): [GameWithResult, GameWithResult] => {
             const [game1, game2] = currentGroup;
 
-            if (game1.team1.country === team.country) {
-              return [
-                { ...game1, team1Score: value, winner: undefined },
-                game2,
-              ];
-            } else if (game1.team2.country === team.country) {
-              return [
-                { ...game1, team2Score: value, winner: undefined },
-                game2,
-              ];
-            } else if (game2.team1.country === team.country) {
-              return [
-                game1,
-                { ...game2, team1Score: value, winner: undefined },
-              ];
-            } else if (game2.team2.country === team.country) {
-              return [
-                game1,
-                { ...game2, team2Score: value, winner: undefined },
-              ];
+            if (game1.gameId === gameId) {
+              return [updateGameScore(game1, team, value), game2];
+            } else if (game2.gameId === gameId) {
+              return [game1, updateGameScore(game2, team, value)];
             } else {
               return currentGroup;
             }
@@ -240,6 +224,15 @@ const rounds: Record<number, { readonly name: string }> = {
   2: { name: 'Semi-Final' },
   1: { name: 'Final' },
 };
+
+const updateGameScore = (
+  game: GameWithResult,
+  team: Team,
+  value: number | null,
+): GameWithResult =>
+  team.country === game.team1.country
+    ? { ...game, team1Score: value, winner: undefined }
+    : { ...game, team2Score: value, winner: undefined };
 
 const groupKey = (group: [GameWithResult, GameWithResult]): string => {
   const [game1, game2] = group;

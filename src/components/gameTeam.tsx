@@ -16,13 +16,14 @@ interface Props {
   readonly team: Team;
   readonly winner: Team | null;
   readonly tied: boolean;
+  readonly gameId: number;
 
-  onScoreChange(team: Team, value: number | null): void;
+  onScoreChange(gameId: number, team: Team, value: number | null): void;
   onWinnerSelected(team: Team): void;
 }
 
 export const GameTeam: React.FC<Props> = (props: Props): React.ReactElement => {
-  const { score, team, tied, winner, onScoreChange, onWinnerSelected } = props;
+  const { score, team, tied, winner, gameId, onScoreChange, onWinnerSelected } = props;
   const theme = useTheme();
 
   const checked = React.useMemo((): boolean => team.country === winner?.country, [team, winner]);
@@ -61,7 +62,7 @@ export const GameTeam: React.FC<Props> = (props: Props): React.ReactElement => {
       <View style={styles.teamContainer}>
         <TeamItem team={team} />
       </View>
-      <ScoreInput value={score} team={team} onChange={onScoreChange} />
+      <ScoreInput value={score} team={team} gameId={gameId} onChange={onScoreChange} />
     </View>
   );
 };

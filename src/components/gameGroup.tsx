@@ -11,7 +11,7 @@ interface Props {
   readonly group: readonly [GameWithResult, GameWithResult];
 
   onWinnerSelected(team: Team): void;
-  onChange(team: Team, value: number | null): void;
+  onChange(gameId: number, team: Team, value: number | null): void;
 }
 
 export const GameGroup: React.FC<Props> = (

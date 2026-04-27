@@ -81,7 +81,7 @@ export const Final: React.FC<Props> = (props: Props): React.ReactElement => {
   ]);
 
   const handleChange = React.useCallback(
-    (team: Team, value: number | null): void => {
+    (_gameId: number, team: Team, value: number | null): void => {
       setCurrentGame(
         (previousValue: GameWithResult): GameWithResult =>
           team.country === previousValue.team1.country

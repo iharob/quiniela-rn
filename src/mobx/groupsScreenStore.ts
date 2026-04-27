@@ -7,6 +7,7 @@ import {
   ClassificationGroup,
   computeClassificationTable,
 } from '@app/types/classifications';
+import { Team } from '@app/types/game';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { action, computed, makeObservable, observable } from 'mobx';
 import React from 'react';
@@ -57,35 +58,38 @@ export class GroupsScreenStore {
   }
 
   public updateGameScore(
-    groupName: string,
     gameId: number,
-    teamKey: 'team1' | 'team2',
+    team: Team,
     value: number | null,
   ): void {
+    let updatedGroupName: string | null = null;
+
     this.groups = this.groups.map(
       (group: GroupWithResults): GroupWithResults => {
-        if (group.name !== groupName) {
+        let changed = false;
+        const games = group.games.map((game: GameWithResult): GameWithResult => {
+          if (game.gameId !== gameId) {
+            return game;
+          }
+          changed = true;
+          return team.country === game.team1.country
+            ? { ...game, team1Score: value }
+            : { ...game, team2Score: value };
+        });
+
+        if (!changed) {
           return group;
         }
-
-        return {
-          name: group.name,
-          games: group.games.map((game: GameWithResult): GameWithResult => {
-            if (game.gameId !== gameId) {
-              return game;
-            } else if (teamKey === 'team1') {
-              return { ...game, team1Score: value };
-            } else {
-              return { ...game, team2Score: value };
-            }
-          }),
-        };
+        updatedGroupName = group.name;
+        return { name: group.name, games };
       },
     );
 
-    this.saveGroup(groupName).catch((error: Error): void => {
-      console.warn(error);
-    });
+    if (updatedGroupName !== null) {
+      this.saveGroup(updatedGroupName).catch((error: Error): void => {
+        console.warn(error);
+      });
+    }
   }
 
   private async saveGroup(groupName: string): Promise<void> {

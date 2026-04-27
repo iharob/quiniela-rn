@@ -23,7 +23,7 @@ interface Props {
   readonly expanded: boolean;
   readonly dimmed: boolean;
   onToggle(name: string): void;
-  onScoreChange(team: Team, value: number | null): void;
+  onScoreChange(gameId: number, team: Team, value: number | null): void;
 }
 
 export const GroupAccordionRow: React.FC<Props> = (props: Props): React.ReactElement => {
@@ -189,11 +189,13 @@ export const GroupAccordionRow: React.FC<Props> = (props: Props): React.ReactEle
                       <ScoreInput
                         value={game.team1Score}
                         team={game.team1}
+                        gameId={game.gameId}
                         onChange={onScoreChange}
                       />
                       <ScoreInput
                         value={game.team2Score}
                         team={game.team2}
+                        gameId={game.gameId}
                         onChange={onScoreChange}
                       />
                     </View>

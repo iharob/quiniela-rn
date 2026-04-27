@@ -9,7 +9,7 @@ interface Props {
   readonly winner: Team | null;
 
   onWinnerSelected(team: Team): void;
-  onChange(team: Team, value: number | null): void;
+  onChange(gameId: number, team: Team, value: number | null): void;
 }
 
 export const Game: React.FC<Props> = (props: Props): React.ReactElement => {
@@ -25,6 +25,7 @@ export const Game: React.FC<Props> = (props: Props): React.ReactElement => {
       <GameTeam
         score={game.team1Score}
         team={game.team1}
+        gameId={game.gameId}
         winner={winner}
         tied={tied}
         onScoreChange={onChange}
@@ -33,6 +34,7 @@ export const Game: React.FC<Props> = (props: Props): React.ReactElement => {
       <GameTeam
         score={game.team2Score}
         team={game.team2}
+        gameId={game.gameId}
         winner={winner}
         tied={tied}
         onScoreChange={onChange}
