@@ -1,6 +1,8 @@
 import { GOOGLE_WEB_CLIENT_ID } from '@app/config';
 import { Api, ApiContext } from '@app/context/api';
+import { queryClient } from '@app/queryClient';
 import { MainNavigator } from '@app/screens/main';
+import { useFcmBootstrap } from '@app/services/fcm/useFcmBootstrap';
 import { ThemeProvider } from '@app/theme/ThemeContext';
 import { defaultTheme } from '@app/types/tournamentConfig';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -11,10 +13,9 @@ import {
 } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 const apiInstance = new Api();
-const queryClient = new QueryClient();
 
 GoogleSignin.configure({
   webClientId: GOOGLE_WEB_CLIENT_ID,
@@ -36,11 +37,17 @@ const applicationTheme: Theme = {
   fonts: DefaultTheme.fonts,
 };
 
+const FcmBoot: React.FC = (): null => {
+  useFcmBootstrap();
+  return null;
+};
+
 const App: React.FC = (): React.ReactElement => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={defaultTheme}>
         <ApiContext.Provider value={apiInstance}>
+          <FcmBoot />
           <View style={styles.container}>
             <NavigationContainer theme={applicationTheme}>
               <MainNavigator />

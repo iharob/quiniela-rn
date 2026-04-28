@@ -12,10 +12,17 @@ export interface UserResult {
   readonly team2Score: number;
 }
 
+export interface LiveScore {
+  readonly team1Score: number;
+  readonly team2Score: number;
+  readonly status: string;
+}
+
 export interface GameResultGroup {
   readonly team1: Team;
   readonly team2: Team;
   readonly groupResults: readonly UserResult[];
+  readonly liveScore?: LiveScore;
 }
 
 export interface SelfResult {

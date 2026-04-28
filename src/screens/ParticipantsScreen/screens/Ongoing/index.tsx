@@ -8,18 +8,36 @@ import { useThemedStyles } from '@app/theme/useThemedStyles';
 import { TournamentTheme } from '@app/types/tournamentConfig';
 import {
   GameResultGroup,
+  LiveScore,
   SelfResult,
   UserResult,
 } from '@app/types/userResults';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React from 'react';
 import {
-  ListRenderItemInfo,
   SectionList,
   SectionListData,
+  SectionListRenderItemInfo,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+
+type Row =
+  | { readonly kind: 'live'; readonly live: LiveScore }
+  | { readonly kind: 'user'; readonly result: UserResult };
+
+type SectionMeta = Omit<GameResultGroup & SelfResult, 'groupResults'>;
+type Section = SectionListData<Row, SectionMeta>;
+
+const isExactMatch = (
+  result: UserResult,
+  live: LiveScore | undefined,
+): boolean =>
+  live !== undefined &&
+  result.team1Score === live.team1Score &&
+  result.team2Score === live.team2Score;
 
 export const Ongoing: React.FC = (): React.ReactElement => {
   const sessionStore = useSessionStore();
@@ -32,48 +50,36 @@ export const Ongoing: React.FC = (): React.ReactElement => {
   }, [refetch]);
 
   const sections = React.useMemo(
-    (): ReadonlyArray<
-      SectionListData<
-        UserResult,
-        Omit<GameResultGroup & SelfResult, 'groupResults'>
-      >
-    > =>
-      results.map(
-        (
-          group: GameResultGroup,
-        ): SectionListData<
-          UserResult,
-          Omit<GameResultGroup & SelfResult, 'groupResults'>
-        > => {
-          const { results: groupResults } = group;
+    (): ReadonlyArray<Section> =>
+      results.map((group: GameResultGroup): Section => {
+        const { groupResults, liveScore } = group;
+        const userRows: ReadonlyArray<Row> = groupResults
+          .filter(({ user }: UserResult): boolean => user.id !== currentUserId)
+          .map((result: UserResult): Row => ({ kind: 'user', result }));
+        const data: ReadonlyArray<Row> =
+          liveScore !== undefined
+            ? [{ kind: 'live', live: liveScore }, ...userRows]
+            : userRows;
 
-          return {
-            self: groupResults.find(
-              ({ user }: UserResult): boolean => user.id === currentUserId,
-            ),
-            team1: group.team1,
-            team2: group.team2,
-            data: groupResults.filter(
-              ({ user }: UserResult): boolean => user.id !== currentUserId,
-            ),
-          };
-        },
-      ),
+        return {
+          self: groupResults.find(
+            ({ user }: UserResult): boolean => user.id === currentUserId,
+          ),
+          team1: group.team1,
+          team2: group.team2,
+          liveScore,
+          data,
+        };
+      }),
     [currentUserId, results],
   );
 
   const renderSectionHeader = React.useCallback(
-    ({
-      section,
-    }: {
-      section: SectionListData<
-        UserResult,
-        Omit<GameResultGroup & SelfResult, 'groupResults'>
-      >;
-    }): React.ReactElement => {
-      const { team1, team2, self } = section;
+    ({ section }: { section: Section }): React.ReactElement => {
+      const { team1, team2, self, liveScore } = section;
       if (self) {
         const { user } = self;
+        const exact = isExactMatch(self, liveScore);
 
         return (
           <View style={themedStyles.headerRow}>
@@ -111,6 +117,13 @@ export const Ongoing: React.FC = (): React.ReactElement => {
                 >
                   {user.name}
                 </Text>
+                {exact ? (
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    color={themedStyles.exactIcon.color}
+                    size={14}
+                  />
+                ) : null}
               </View>
               <Text
                 style={[
@@ -148,23 +161,66 @@ export const Ongoing: React.FC = (): React.ReactElement => {
   );
 
   const renderItem = React.useCallback(
-    (itemInfo: ListRenderItemInfo<UserResult>): React.ReactElement => {
-      const { item } = itemInfo;
-      const { user } = item;
+    (
+      itemInfo: SectionListRenderItemInfo<Row, SectionMeta>,
+    ): React.ReactElement => {
+      const { item, section } = itemInfo;
+
+      if (item.kind === 'live') {
+        const { live } = item;
+        return (
+          <View style={[themedStyles.row, themedStyles.liveRow]}>
+            <Text
+              style={[
+                themedStyles.rowText,
+                styles.teamCell,
+                themedStyles.liveScore,
+              ]}
+            >
+              {live.team1Score}
+            </Text>
+            <View style={styles.userCell}>
+              <Text style={[themedStyles.rowText, themedStyles.liveStatus]}>
+                {live.status || 'EN VIVO'}
+              </Text>
+            </View>
+            <Text
+              style={[
+                themedStyles.rowText,
+                styles.teamCell,
+                themedStyles.liveScore,
+              ]}
+            >
+              {live.team2Score}
+            </Text>
+          </View>
+        );
+      }
+
+      const { result } = item;
+      const { user } = result;
+      const exact = isExactMatch(result, section.liveScore);
 
       return (
         <View style={themedStyles.row}>
           <Text style={[themedStyles.rowText, styles.teamCell]}>
-            {item.team1Score}
+            {result.team1Score}
           </Text>
           <View style={styles.userCell}>
             <Avatar name={user.name} uri={user.photoUrl} size={28} />
             <Text style={[themedStyles.rowText, styles.userName]}>
               {user.name}
             </Text>
+            {exact ? (
+              <FontAwesomeIcon
+                icon={faCheck}
+                color={themedStyles.exactIcon.color}
+                size={14}
+              />
+            ) : null}
           </View>
           <Text style={[themedStyles.rowText, styles.teamCell]}>
-            {item.team2Score}
+            {result.team2Score}
           </Text>
         </View>
       );
@@ -211,6 +267,22 @@ const themedStylesFactory = (theme: TournamentTheme) =>
     },
     self: {
       color: theme.contrastTextColor,
+    },
+    liveRow: {
+      backgroundColor: theme.dimmedCardColor,
+    },
+    liveScore: {
+      color: theme.primaryColorBright,
+      fontSize: 20,
+    },
+    liveStatus: {
+      textTransform: 'uppercase',
+      fontWeight: '700',
+      letterSpacing: 0.5,
+      color: theme.primaryColor,
+    },
+    exactIcon: {
+      color: theme.primaryColorBright,
     },
   });
 
