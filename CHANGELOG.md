@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/iharob/quiniela-rn/compare/v1.0.0...v1.1.0) (2026-04-28)
+
+
+### Features
+
+* **live-scores:** show live scores via Firebase Cloud Messaging ([cd86609](https://github.com/iharob/quiniela-rn/commit/cd866091083570e28339e245109c3e3b7ad208ba))
+
 ## 1.0.0 (2026-04-27)
 
 
