@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/iharob/quiniela-rn/compare/v1.1.0...v1.1.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* **android:** resolve manifest merger conflict for FCM notification channel ([e953282](https://github.com/iharob/quiniela-rn/commit/e953282f5966bfb388e5d6de0f1a2b1ca5dd39a9))
+
 ## [1.1.0](https://github.com/iharob/quiniela-rn/compare/v1.0.0...v1.1.0) (2026-04-28)
 
 
